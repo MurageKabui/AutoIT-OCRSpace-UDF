@@ -47,7 +47,7 @@ ConsoleWrite( _
 
 <details>
 
-<summary>  [Click to expand the full script] </summary>
+<summary>  🔰 [Click to expand the full script] </summary>
 
 
 

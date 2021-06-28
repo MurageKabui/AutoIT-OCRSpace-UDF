@@ -20,7 +20,8 @@
  - [x] Image auto-scaling (for low DPI image resolutions)
  - [x] OCR Engine selection
  - [x] OCR Options validation 
- - [ ] Overlay text info extraction.
+ - [ ] Overlay text extraction (As Array)
+ - [x] Overlay text extraction (As JSON) 
 
 
 <hr/>

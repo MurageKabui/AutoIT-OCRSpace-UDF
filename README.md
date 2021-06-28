@@ -9,10 +9,10 @@
 </p>
 
 <hr/>
-	My main goal for developing this UDF was to provide AutoIT users with a better Screen OCR solution that competes with other (explictly)
+<!-- 	My main goal for developing this UDF was to provide AutoIT users with a better Screen OCR solution that competes with other (explictly)
 	commercial solutions like Microsoft Office Document Imaging (MODI) and Textract. The OCRSpace API is a Free OCR web 
 	service that takes a JPG, PNG or PDF file and converts them to text or searchable PDF. Although their free plan has a rate limit of 500 
-	requests within one day (per IP), for even faster response times and guaranteed 100% uptime, consider subscribing to a PRO plan!
+	requests within one day (per IP), for even faster response times and guaranteed 100% uptime, consider subscribing to a PRO plan! -->
 
 <hr/>
 
@@ -128,7 +128,7 @@ This code is in no way affiliated with, authorized, maintained, sponsored or end
 This is independent and unofficial. Use at your own risk.
 
 <hr/>
-
+<!-- 
 ## About
 Hate to ask you to star this cs if you found this creation useful, this will happen naturally, 
-For support, just contact me! Enjoy 🎉
+For support, just contact me! Enjoy 🎉 -->

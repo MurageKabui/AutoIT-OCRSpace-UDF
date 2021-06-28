@@ -1,28 +1,18 @@
 
-## UDFs for AutoIt
-
-
 <p align="center">
   <img src="https://i.imgur.com/fpHBLJw.png"><br>
 </p>
 <p align="center">
-	<b>The OCR.space Online OCR service converts scans or (smartphone) images of text documents <br>
-		into editable files by using Optical Character Recognition (OCR)
-		<br>
+	<b> This UDF provides text capturing support for applications and controls using the OCRSpace API - a powerful Online OCR service that 
+		converts images of text documents into editable files by using Optical Character Recognition (OCR)
+	<br>
 </p>
 
 <hr/>
-	
-#### Supports :
- - [x] Image and PDF upload using a local and/or uri reference. (.png, .jpg, .webp, .PDF)
- - [x] Requesting for a searchable PDF 
- - [x] Receipt scanning and/or table recognition
- - [x] Image auto-scaling (for low DPI image resolutions)
- - [x] OCR Engine selection
- - [x] OCR Options validation 
- - [ ] Overlay text extraction (As Array)
- - [x] Overlay text extraction (As JSON) 
-
+	My main goal for developing this UDF was to provide AutoIT users with a better Screen OCR solution that competes with other (explictly)
+	commercial solutions like Microsoft Office Document Imaging (MODI) and Textract. The OCRSpace API is a Free OCR web 
+	service that takes a JPG, PNG or PDF file and converts them to text or searchable PDF. Although their free plan has a rate limit of 500 
+	requests within one day (per IP), for even faster response times and guaranteed 100% uptime, consider subscribing to a PRO plan!
 
 <hr/>
 
@@ -41,6 +31,7 @@ $a_ocr = _OCRSpace_SetUpOCR("0123456789abcdefABCDEF", 1, false, true, "eng")
 ```AutoIT
 $a_ocr = _OCRSpace_SetUpOCR("0123456789abcdefABCDEF", 1, false, true, "eng")
 ```
+
 
 <hr/>
 
@@ -90,6 +81,7 @@ ConsoleWrite( _
 
 <br>
 
+
 <hr/>
 
 ### Request for a searchable PDF
@@ -115,17 +107,10 @@ ConsoleWrite( _
 ```
 <hr/>
 
-#### Remarks:
- - don
- - dfdf
- - fdf
- - 
-```autoit
-While 1 ;Create a While that restart Polling
-	$msgData = _Polling() ;_Polling function return an array with information about a message
-	_SendMsg($msgData[2],$msgData[5]) ;Send a message to the same user with the same text
-WEnd
-```
+#### Other:
+ - Check the API performance and uptime at the API status page [here](https://status.ocr.space/)
+ - Register here for your free OCR API key [here](http://eepurl.com/bOLOcf)
+ - Subscribe to a PRO plan [here](https://ocr.space/OCRAPI#pro)
 
 
 If you want to try all the available features of the OCR API, check out their full documentation [here](https://ocr.space/OCRAPI)!
@@ -145,5 +130,5 @@ This is independent and unofficial. Use at your own risk.
 <hr/>
 
 ## About
-Can't ask you to star this: if you enjoyed what I did, this will happen naturally.
+Hate to ask you to star this cs if you found this creation useful, this will happen naturally, 
 For support, just contact me! Enjoy 🎉

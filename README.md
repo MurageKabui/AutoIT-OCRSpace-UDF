@@ -13,22 +13,38 @@
 
 <hr/>
 	
+#### Supports :
+ - [x] Image and PDF upload using a local and/or uri reference. (.png, .jpg, .webp, .PDF)
+ - [x] Requesting for a searchable PDF 
+ - [x] Receipt scanning and/or table recognition
+ - [x] Image auto-scaling (for low DPI image resolutions)
+ - [x] OCR Engine selection
+ - [x] OCR Options validation 
+ - [ ] Overlay text info extraction.
+
+
+<hr/>
+
 ### Setting up
 1. Assuming the udf is present in the working directory,  include it in your script with the directive : 
 ```Autoit
 #include "_OCRSpace.au3"
 ```
-2. Initialize your preferences beforehand with the function ```_OCRSpace_SetUpOCR```. <br>
-	You'll have to set up your API key at least. 
+2. Initialize your preferences beforehand with the function ```_OCRSpace_SetUpOCR```. <br> Here ,
+	you're required to set up your API key at least. 
 ```AutoIT
-$a_ocr = _OCRSpace_SetUpOCR(0123456789abcdefABCDEF, 1, false, true, "eng")
+$a_ocr = _OCRSpace_SetUpOCR("0123456789abcdefABCDEF", 1, false, true, "eng")
 ```
 3. Parse the returned array "*handle*" from the function `_OCRSpace_SetUpOCR` to the first parameter of <br>
 	 the function ```_OCRSpace_ImageGetText```, along with the rest of the optional or  required parameters.
+```AutoIT
+$a_ocr = _OCRSpace_SetUpOCR("0123456789abcdefABCDEF", 1, false, true, "eng")
+```
 
 <hr/>
 
 ### Usage
+
 ```autoit
 ; get your free key at http://eepurl.com/bOLOcf
 $api_key = "0123456789abcdefABCDEF"
@@ -50,10 +66,8 @@ ConsoleWrite( _
 
 <summary>  🔰 [Click to expand the full script] </summary>
 
-
-
-  ```AutoIT
-  #include "OCRSpace_UDF.au3"
+```AutoIT
+#include "OCRSpace_UDF.au3"
 
 ; get your free key at http://eepurl.com/bOLOcf
 $api_key = "0123456789abcdefABCDEF"
@@ -70,16 +84,14 @@ ConsoleWrite( _
 			" Error Returned  : " & @error & @CRLF)
 			
 ```
-
- 
-
+	
 </details>
 
 <br>
 
 <hr/>
 
-### How to request for a searchable PDF
+### Request for a searchable PDF
 
 A searchable PDF can be requested and its URI retrieved by:
 1. Set the last option of the `_OCRSpace_SetUpOCR` to `True` :
@@ -102,7 +114,11 @@ ConsoleWrite( _
 ```
 <hr/>
 
-#### Example:
+#### Remarks:
+ - don
+ - dfdf
+ - fdf
+ - 
 ```autoit
 While 1 ;Create a While that restart Polling
 	$msgData = _Polling() ;_Polling function return an array with information about a message

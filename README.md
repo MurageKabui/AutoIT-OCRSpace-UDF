@@ -18,12 +18,13 @@
 ```Autoit
 #include "_OCRSpace.au3"
 ```
-2. Initialize your preferences beforehand with the function ```_OCRSpace_SetUpOCR```. You'll have to set up your API key at least. 
+2. Initialize your preferences beforehand with the function ```_OCRSpace_SetUpOCR```. <br>
+	You'll have to set up your API key at least. 
 ```AutoIT
 $a_ocr = _OCRSpace_SetUpOCR(0123456789abcdefABCDEF, 1, false, true, "eng")
 ```
-3. Parse the returned array "*handle*" from the function `_OCRSpace_SetUpOCR` to the first parameter of the function 
-	```_OCRSpace_ImageGetText```, along with the rest of the optional or  required parameters.
+3. Parse the returned array "*handle*" from the function `_OCRSpace_SetUpOCR` to the first parameter of <br>
+	 the function ```_OCRSpace_ImageGetText```, along with the rest of the optional or  required parameters.
 
 <hr/>
 

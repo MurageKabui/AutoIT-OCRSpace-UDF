@@ -1,16 +1,14 @@
-<!-- ## A OCRSpace UDF for AU3 v3.3.14.5 -->
+
+## UDFs for AutoIt
 
 
 <p align="center">
-  <img src="https://imgur.com/Kumm7jS"><br>
+  <img src="https://i.imgur.com/fpHBLJw.png"><br>
 </p>
 <p align="center">
-<b> This lib uses an Online OCR service that converts scans images of text documents into editable files by using Optical Character Recognition (OCR)</b><br>
-</p>
-
-<p align="center">
-  ⚙️ Telegram UDF is on the official AutoIt Script UDFs list! Check it <a href="https://www.autoitscript.com/wiki/User_Defined_Functions#Social_Media_and_other_Website_API">here!</a></b>
-
+	<b>The OCR.space Online OCR service converts scans or (smartphone) images of text documents <br>
+		into editable files by using Optical Character Recognition (OCR)
+		<br>
 </p>
 
 ### Setting up
@@ -19,8 +17,11 @@
 #include "_OCRSpace.au3"
 ```
 2. Initialize your preferences beforehand with the function ```_OCRSpace_SetUpOCR```. You'll have to set up your API key at least. 
-
-3. Parse the returned array "*handle*" from the function `_OCRSpace_SetUpOCR` to the first parameter of the function ```_OCRSpace_ImageGetText```, along with the rest of the optional or  required parameters.
+```AutoIT
+$a_ocr = _OCRSpace_SetUpOCR(0123456789abcdefABCDEF, 1, false, true, "eng")
+```
+3. Parse the returned array "*handle*" from the function `_OCRSpace_SetUpOCR` to the first parameter of the function 
+	```_OCRSpace_ImageGetText```, along with the rest of the optional or  required parameters.
 
 
 ### Usage
@@ -36,14 +37,16 @@ $s_textdetected = _OCRSpace_ImageGetText($a_ocr , "https://i.imgur.com/KrS6rRT.j
 
 ; display the result.
 ConsoleWrite( _
-" Detected text   : " & $s_textdetected & @CRLF & _
-" Error Returned  : " & @error & @CRLF)
+	" Detected text   : " & $s_textdetected & @CRLF & _
+	" Error Returned  : " & @error & @CRLF)
 
 ```
 
 <details>
 
 <summary>  [Click to expand the full script] </summary>
+
+
 
   ```AutoIT
   #include "OCRSpace_UDF.au3"
@@ -59,9 +62,9 @@ $s_textdetected = _OCRSpace_ImageGetText($a_ocr , "https://i.imgur.com/KrS6rRT.j
 
 ; display the result.
 ConsoleWrite( _
-	" Detected text   : " & $s_textdetected & @CRLF & _
-	" Error Returned  : " & @error & @CRLF)
-	
+			" Detected text   : " & $s_textdetected & @CRLF & _
+			" Error Returned  : " & @error & @CRLF)
+			
 ```
 
  
@@ -84,12 +87,13 @@ $a_ocr = _OCRSpace_SetUpOCR($api_key, 1, false, true, "eng", true, Default, Defa
 ; scan a receipt (using a image uri reference). The url to a searchable pdf requested will be assigned to 'MyPDF_URL_'
 $s_textdetected = _OCRSpace_ImageGetText($a_ocr , "https://i.imgur.com/KrS6rRT.jpeg", 0, "MyPDF_URL_")
 ```
-3. Evaluate the string pointing to a url .
+3. Display the results , evaluate the string pointing to a variable containing a URI .
 ```Autoit
 ConsoleWrite( _
-			" Detected text        : " & $s_textdetected & @CRLF & _
-			" Error Returned       : " & @error & @CRLF & _
-			" Searchable PDF  Link : " & Eval("MyPDF_URL_") & @CRLF)
+	" Detected text        : " & $s_textdetected & @CRLF & _
+	" Error Returned       : " & @error & @CRLF & _
+	" Searchable PDF  Link : " & Eval("MyPDF_URL_") & @CRLF)
+
 ```
 #### Example:
 ```autoit
@@ -99,29 +103,18 @@ While 1 ;Create a While that restart Polling
 WEnd
 ```
 
-For a simple text message, the array returned by _Polling() is:
-```
-$msgData[0] = Offset of the current update (used to 'switch' to the next update)
-$msgData[1] = Message ID
-$msgData[2] = Chat ID, use for interact with the user
-$msgData[3] = Username of the user
-$msgData[4] = First name of the user
-$msgData[5] = Text of the message
-```
 
-If you want to try all the available features, use the Test file into /tests folder. Open it, insert your bot's token, your chat id **(make sure you have sent at least one message to the bot)** and then execute it.
-
-## What you need to know
-I'm writing a wiki, you can find it [here](https://github.com/xLinkOut/telegram-udf-autoit/wiki).
+If you want to try all the available features of the OCR API, check out their full documentation [here](https://ocr.space/OCRAPI)!
 
 ## Other credits
-+ Thanks to d
-+ 
++ Thanks to AspirinJunkie for the JSON UDF
+
+
 ## Legal
 **License: GPL v3.0 ©** : Feel free to use this code and adapt it to your software; just mention this page if you share your software (free or paid).
-This code is in no way affiliated with, authorized, maintained, sponsored or endorsed by Telegram and/or AutoIt or any of its affiliates or subsidiaries. This is independent and unofficial. Use at your own risk.
+This code is in no way affiliated with, authorized, maintained, sponsored or endorsed by OCRSpace and/or AutoIt or any of its affiliates or subsidiaries.
+This is independent and unofficial. Use at your own risk.
 
 ## About
-If you want to donate for support my (future) works, use this: https://www.paypal.me/LCirillo. ❤️
-
+Can't ask you to star this: if you enjoyed what I did, this will happen naturally.
 For support, just contact me! Enjoy 🎉

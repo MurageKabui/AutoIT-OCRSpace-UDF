@@ -107,17 +107,16 @@ ConsoleWrite( _
 ```
 <hr/>
 
-#### Other:
+
  - Check the API performance and uptime at the API status page [here](https://status.ocr.space/)
  - Register here for your free OCR API key [here](http://eepurl.com/bOLOcf)
  - Subscribe to a PRO plan [here](https://ocr.space/OCRAPI#pro)
-
-
-If you want to try all the available features of the OCR API, check out their full documentation [here](https://ocr.space/OCRAPI)!
+ - If you want to try all the available features of the OCR API, check out their full documentation [here](https://ocr.space/OCRAPI)!
 
 <hr/>
 
 ## Other credits
+•••
 + Thanks to AspirinJunkie for the JSON UDF
 
 <hr/>

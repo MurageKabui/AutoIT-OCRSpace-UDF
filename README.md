@@ -14,6 +14,10 @@
 	service that takes a JPG, PNG or PDF file and converts them to text or searchable PDF. Although their free plan has a rate limit of 500 
 	requests within one day (per IP), for even faster response times and guaranteed 100% uptime, consider subscribing to a PRO plan! -->
 
+<!-- <hr/> -->
+
+Plot : https://github.com/users/KabueMurage/projects/7
+
 <hr/>
 
 ### Setting up

@@ -126,9 +126,9 @@ ConsoleWrite( _
 <hr/>
 
 ## Legal
-**License: GPL v3.0 ©** : Feel free to use this code and adapt it to your software; just mention this page if you share your software (free or paid).
-This code is in no way affiliated with, authorized, maintained, sponsored or endorsed by OCRSpace and/or AutoIt or any of its affiliates or subsidiaries.
-This is independent and unofficial. Use at your own risk.
+<!-- **License: GPL v3.0 ©** : Feel free to use this code and adapt it to your software; just mention this page if you share your software (free or paid). -->
+Use this however tf you want, all at your own risk. This code is in no way affiliated with, authorized, maintained, sponsored or endorsed by OCRSpace 
+and/or AutoIt or any of its affiliates or subsidiaries. This is independent and unofficial.
 
 <hr/>
 <!-- 

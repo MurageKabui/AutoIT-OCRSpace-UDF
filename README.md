@@ -33,7 +33,7 @@ $a_ocr = _OCRSpace_SetUpOCR("0123456789abcdefABCDEF", 1, false, true, "eng")
 3. Parse the returned array "*handle*" from the function `_OCRSpace_SetUpOCR` to the first parameter of <br>
 	 the function ```_OCRSpace_ImageGetText```, along with the rest of the optional or  required parameters.
 ```AutoIT
-$a_ocr = _OCRSpace_SetUpOCR("0123456789abcdefABCDEF", 1, false, true, "eng")
+$sText_Detected = _OCRSpace_ImageGetText($a_ocr, "receipt.jpg", 0)
 ```
 
 

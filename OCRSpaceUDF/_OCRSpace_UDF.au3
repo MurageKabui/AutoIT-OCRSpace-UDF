@@ -1,7 +1,8 @@
 ; #include <array.au3>
 #include-once
+#include <ScreenCapture.au3>
 #include "Json.au3"
-
+#include <array.au3>
 ; =========================================================
 ; Title ...............: _OCRSpace_UDF.au3
 ; Author ..............: Kabue Murage
@@ -17,12 +18,36 @@
 ; =========================================================
 
 
+; It’s always good practice to attempt to catch error events from an object,
+; so as to react to these errors instead of the Run Script action simply failing in Workflow.
+; ObjEvent($ObjectVar, functionprefix, "[interface name]")
+
+
 
 ; #CURRENT# =====================================================================================================================
 ;_OCRSpace_SetUpOCR
 ;_OCRSpace_ImageGetText
 ; ===============================================================================================================================
 
+
+; HTTPReq.setRequestHeader "User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/84.0.4147.105 Safari/537.36
+
+; This one can only be called after enabling overlay json info.
+; Func _OCRSpace_WinClickText($hWndow, $aReturnedArrayRef, $sDelimitedText = "", $ClickType = 0, $bShowMouseMovement = false)
+
+; 	; Splits the text to be clicked using the default GUIDataSeparatorChar
+; 	$a_lTexts__ = StringSplit($sDelimitedText, , $v_lDatSeparator, 1)
+; 	; _ArrayDisplay($a_lTexts__)
+
+; 	; sDelimitedText = word1 ; word2 ; word3
+
+; 	; Get the handle to send some clicks.
+; 	$h_lHandle = WinGetHandle ($hWndow, "")
+; 	; Search for the word from the array..
+; 	; _ArraySearch()
+; 	; Retrieve the coordinates for the word..
+; 	; Simulate a click to the word..
+; EndFunc
 
 ; #FUNCTION# ================================================================================================================================
 ; Name...........:  _OCRSpace_SetUpOCR()
@@ -137,9 +162,8 @@ EndFunc   ;==>_OCRSpace_SetUpOCR
 ;                        6 - Failed to create http object
 ;
 ;
-; Remarks .......: - Setup your OCR options beforehand using _OCRSpace_SetUpOCR. Also note that the URL method is easy and fast to use.
-;
-;                  - StringLeft(@error, 1) shows if OCR Engine completed successfully, partially or failed with error. 
+; Remarks .......: - Setup your OCR options beforehand using _OCRSpace_SetUpOCR. Also note that the URL method is easy and fast to use, compared to uploading a local file.
+;                  - StringLeft(@error, 1) shows if OCR Engine completed successfully, partially or failed with error.
 ;                        1 - Parsed Successfully (Image / All pages parsed successfully)
 ;                        2 - Parsed Partially (Only few pages out of all the pages parsed successfully)
 ;                        3 - Image / All the PDF pages failed parsing (This happens mainly because the OCR engine fails to parse an image)
@@ -161,13 +185,13 @@ Func _OCRSpace_ImageGetText($aOCR_OptionsHandle, $sImage_UrlOrFQPN, $iReturnType
 
 	If (FileExists($sImage_UrlOrFQPN) And StringInStr(FileGetAttrib($sImage_UrlOrFQPN), "D") = 0) Then
 		$s_lExt = (StringTrimLeft($sImage_UrlOrFQPN, StringInStr($sImage_UrlOrFQPN, ".", 0, -1)))
-        Switch $s_lExt
-            Case "PDF", "GIF", "PNG", "JPG", "TIF", "BMP", "PDF"
-                ; Supported image file formats are png, jpg (jpeg), gif, tif (tiff) and bmp.
-                ; For document ocr, the api supports the Adobe PDF format. Multi-page TIFF files are supported.
-            Case Else
-                Return SetError(5, 0, "")
-        EndSwitch
+		Switch $s_lExt
+			Case "PDF", "GIF", "PNG", "JPG", "TIF", "BMP", "PDF", "JPEG"
+				; Supported image file formats are png, jpg (jpeg), gif, tif (tiff) and bmp.
+				; For document ocr, the api supports the Adobe PDF format. Multi-page TIFF files are supported.
+			Case Else
+				Return SetError(5, 0, "")
+		EndSwitch
 
 		$h_lFileOpen__ = FileOpen($sImage_UrlOrFQPN, 16)
 		If $h_lFileOpen__ = "-1" Then Return SetError(3, 0, "")
@@ -177,7 +201,7 @@ Func _OCRSpace_ImageGetText($aOCR_OptionsHandle, $sImage_UrlOrFQPN, $iReturnType
 		$s_lEncb64Dat__ = __URLEncode_($s_lb64Dat__)
 
 		$h_lRequestObj__ = __POSTObjCreate()
-		if $h_lRequestObj__ = "-1" then Return SetError(6, 0 , "")
+		If $h_lRequestObj__ = "-1" Then Return SetError(6, 0, "")
 
 		$h_lRequestObj__.Open("POST", "https://api.ocr.space/parse/image", False)
 		$s_lParams__ = "base64Image=data:image/" & $s_lExt & ";base64," & $s_lEncb64Dat__ & "&"
@@ -196,16 +220,16 @@ Func _OCRSpace_ImageGetText($aOCR_OptionsHandle, $sImage_UrlOrFQPN, $iReturnType
 		; PDF submissions via the URL method as only HTTP POST requests can supply additional
 		; data to the server in the message body.
 		$s_lExt = (StringTrimLeft($sImage_UrlOrFQPN, StringInStr($sImage_UrlOrFQPN, ".", 0, -1)))
-         Switch $s_lExt
-            Case "PDF", "GIF", "PNG", "JPG", "BMP", "PDF"
-                ; Supported image file formats are png, jpg (jpeg), gif, tif (tiff) and bmp.
-                ; For document ocr, the api supports the Adobe PDF format. Multi-page TIFF files are supported.
-            Case Else
-                Return SetError(5, 0, "")
-        EndSwitch
+		Switch $s_lExt
+			Case "PDF", "GIF", "PNG", "JPG", "BMP", "PDF", "JPEG"
+				; Supported image file formats are png, jpg (jpeg), gif, tif (tiff) and bmp.
+				; For document ocr, the api supports the Adobe PDF format. Multi-page TIFF files are supported.
+			Case Else
+				Return SetError(5, 0, "")
+		EndSwitch
 
 		$h_lRequestObj__ = _GETObjCreate()
-		if $h_lRequestObj__ = "-1" then Return SetError(6, 0 , "")
+		If $h_lRequestObj__ = "-1" Then Return SetError(6, 0, "")
 
 		; Every option for this api call is to be parsed inside the URL! So , all the parameters can
 		; be appended to create a valid url. So by design, a GET api cannot support file uploads
@@ -236,23 +260,17 @@ Func _OCRSpace_ImageGetText($aOCR_OptionsHandle, $sImage_UrlOrFQPN, $iReturnType
 
 	Switch Int($i_lAPIRespStatusCode__)
 		Case 200
-			If ($aOCR_OptionsHandle[3][1]) And ($iReturnType <> 0) Then
-				; $aOCR_OptionsHandle[3][1] = ..
-				; ConsoleWrite("Overlay info requested. Returning the json" & @CRLF )
-				Return SetError(0, 0, $s_lAPIResponseText__)
+			If ($aOCR_OptionsHandle[3][1]) And ($iReturnType = 1) Then
+				ConsoleWrite("Overlay info requested as an array :)" & @CRLF )
 			EndIf
 			Local $o_lJson__ = _JSON_Parse($s_lAPIResponseText__)
 			If Not @error Then
 				$__ErrorCode_ = Null
-				; Get the parsed text.
 				$s_lDetectedTxt__ = _JSON_Get($o_lJson__, "ParsedResults[0].ParsedText")            ; Returned
 				$s_lProcessingTimeInMs = _JSON_Get($o_lJson__, "ProcessingTimeInMilliseconds")      ; Set to @extended.
-
 				; The exit code shows if OCR completed successfully, partially or failed with error.
 				$i_lOCREngineExitCode = _JSON_Get($o_lJson__, "OCRExitCode")                     ; Set to 1 if completed all successfully
 				$__ErrorCode_ &= $i_lOCREngineExitCode
-				; append to errorcode.
-
 				; The exit code returned by the parsing engine. Set to extended..
 				$i_lFileParseExitCode = _JSON_Get($o_lJson__, "ParsedResults[0].FileParseExitCode")
 				$i_lFileParseExitCode = (StringLeft($i_lFileParseExitCode, 1) = "-") ? StringTrimLeft($i_lFileParseExitCode, 1) : $i_lFileParseExitCode
@@ -263,20 +281,47 @@ Func _OCRSpace_ImageGetText($aOCR_OptionsHandle, $sImage_UrlOrFQPN, $iReturnType
 				; 20: Timeout
 				; 30: Validation Error
 				; 99: Unknown Error
-
 				$s__lSearchablePDFURL_ = _JSON_Get($o_lJson__, "SearchablePDFURL")
 				Assign($sURLVar, $s__lSearchablePDFURL_, 2)
 
 				$i_lErrorOnProcessing = (_JSON_Get($o_lJson__, "IsErroredOnProcessing") ? 0 : 1) ; IsErroredOnProcessing is initially bool.
 				$__ErrorCode_ &= $i_lErrorOnProcessing
-
 				Switch $iReturnType
 					Case 0
 						Return SetError($__ErrorCode_, $s_lProcessingTimeInMs, $s_lDetectedTxt__)
-					Case Else
-                        ; TODO : Form array for x/y word coordinates if bool isOverlayRequired is True ($aOCR_OptionsHandle[3][1]) 
-                        ; TODO : Currently returns a full json if isOverlayRequired
-						Return SetError($__ErrorCode_, $s_lProcessingTimeInMs, $s_lDetectedTxt__)
+					Case 1
+						Local $a_lOverlayArray__[0][5]
+						Local $i_lEnumAllJSONObj__ = 0
+						Local $i_lEnumLinesJSONObj__ = 0
+						Local $i_lEnum_row__ = 0
+
+						While True
+							$sWordText = _JSON_Get($o_lJson__, "ParsedResults[0].TextOverlay.Lines[" & $i_lEnumLinesJSONObj__ & "].Words[" & $i_lEnumAllJSONObj__ & "].WordText")
+							If (@error = 5) Then
+								$i_lEnumLinesJSONObj__ = $i_lEnumLinesJSONObj__ + 1
+								$i_lEnumAllJSONObj__ = 0
+							EndIf
+							
+							$iWordPosLeft = _JSON_Get($o_lJson__, "ParsedResults[0].TextOverlay.Lines[" & $i_lEnumLinesJSONObj__ & "].Words[" & $i_lEnumAllJSONObj__ & "].Left")
+							; If $iWordPosLeft = "" Then ExitLoop
+							$iWordPosTop = _JSON_Get($o_lJson__, "ParsedResults[0].TextOverlay.Lines[" & $i_lEnumLinesJSONObj__ & "].Words[" & $i_lEnumAllJSONObj__ & "].Top")
+							$iWordHeight = _JSON_Get($o_lJson__, "ParsedResults[0].TextOverlay.Lines[" & $i_lEnumLinesJSONObj__ & "].Words[" & $i_lEnumAllJSONObj__ & "].Height")
+							$iWordWidth = _JSON_Get($o_lJson__, "ParsedResults[0].TextOverlay.Lines[" & $i_lEnumLinesJSONObj__ & "].Words[" & $i_lEnumAllJSONObj__ & "].Width")
+							If @error Then ExitLoop 1
+
+							ReDim $a_lOverlayArray__[UBound($a_lOverlayArray__, $UBOUND_ROWS) + 1][UBound($a_lOverlayArray__, $UBOUND_COLUMNS)]
+
+							$a_lOverlayArray__[$i_lEnum_row__][0] = $sWordText
+							$a_lOverlayArray__[$i_lEnum_row__][1] = $iWordPosLeft
+							$a_lOverlayArray__[$i_lEnum_row__][2] = $iWordPosTop
+							$a_lOverlayArray__[$i_lEnum_row__][3] = $iWordHeight
+							$a_lOverlayArray__[$i_lEnum_row__][4] = $iWordWidth
+
+							$i_lEnumAllJSONObj__ += 1
+							$i_lEnum_row__ += 1
+						WEnd
+						; _ArrayDisplay($a_lOverlayArray__)
+						Return SetError($__ErrorCode_, $s_lProcessingTimeInMs, $a_lOverlayArray__)
 				EndSwitch
 			EndIf
 		Case Else

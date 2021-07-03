@@ -215,7 +215,7 @@ Func _OCRSpace_ImageGetText($aOCR_OptionsHandle, $sImage_UrlOrFQPN, $iReturnType
 		$h_lRequestObj__.SetRequestHeader("Content-Type", "application/x-www-form-urlencoded")
 		$h_lRequestObj__.Send($s_lParams__)
 
-	ElseIf __IsURL_($sImage_UrlOrFQPN) Then
+	ElseIf _PathIsURLA($sImage_UrlOrFQPN) Then
 		; The important limitation of the GET api endpoint is it only allows image and
 		; PDF submissions via the URL method as only HTTP POST requests can supply additional
 		; data to the server in the message body.
@@ -329,12 +329,21 @@ Func _OCRSpace_ImageGetText($aOCR_OptionsHandle, $sImage_UrlOrFQPN, $iReturnType
 	Return SetError(1, $i_lAPIRespStatusCode__, $s_lAPIResponseText__)
 EndFunc   ;==>_OCRSpace_ImageGetText
 
-; https://www.autoitscript.com/forum/topic/117155-q-islink-function/
-Func __IsURL_($sURL)
-	$a = StringRegExp($sURL, "^(?#Protocol)(?:(?:ht|f)tp(?:s?)\:\/\/|~/|/)?(?#Username:Password)(?:\w+:\w+@)?(?#Subdomains)(?:(?:[-\w]+\.)+(?#TopLevel Domains)(?:com|org|net|gov|mil|biz|info|mobi|name|aero|jobs|museum|travel|[a-z]{2}))(?#Port)(?::[\d]{1,5})?(?#Directories)(?:(?:(?:/(?:[-\w~!$+|.,=]|%[a-f\d]{2})+)+|/)+|\?|#)?(?#Query)(?:(?:\?(?:[-\w~!$+|.,*:]|%[a-f\d{2}])+=(?:[-\w~!$+|.,*:=]|%[a-f\d]{2})*)(?:&(?:[-\w~!$+|.,*:]|%[a-f\d{2}])+=(?:[-\w~!$+|.,*:=]|%[a-f\d]{2})*)*)*(?#Anchor)(?:#(?:[-\w~!$+|.,*:=]|%[a-f\d]{2})*)?$", 3)
-	If @error = 0 Then Return True
-	Return False
-EndFunc   ;==>__IsURL_
+; OLD URL FUNC!!
+; Func __IsURL_($sURL)
+; 	$a = StringRegExp($sURL, "^(?#Protocol)(?:(?:ht|f)tp(?:s?)\:\/\/|~/|/)?(?#Username:Password)(?:\w+:\w+@)?(?#Subdomains)(?:(?:[-\w]+\.)+(?#TopLevel Domains)(?:com|org|net|gov|mil|biz|info|mobi|name|aero|jobs|museum|travel|[a-z]{2}))(?#Port)(?::[\d]{1,5})?(?#Directories)(?:(?:(?:/(?:[-\w~!$+|.,=]|%[a-f\d]{2})+)+|/)+|\?|#)?(?#Query)(?:(?:\?(?:[-\w~!$+|.,*:]|%[a-f\d{2}])+=(?:[-\w~!$+|.,*:=]|%[a-f\d]{2})*)(?:&(?:[-\w~!$+|.,*:]|%[a-f\d{2}])+=(?:[-\w~!$+|.,*:=]|%[a-f\d]{2})*)*)*(?#Anchor)(?:#(?:[-\w~!$+|.,*:=]|%[a-f\d]{2})*)?$", 3)
+; 	If @error = 0 Then Return True
+; 	Return False
+; EndFunc   ;==>__IsURL_
+
+
+Func _PathIsURLA($_sPath)
+    Local $_aCall = DllCall("shlwapi.dll", "BOOL", "PathIsURLA", "STR", $_sPath)
+    If @error=0 And IsArray($_aCall) Then
+        Return $_aCall[0]=1
+    EndIf
+    Return False
+EndFunc
 
 Func __URLEncode_($urlText)
 	$url = ""

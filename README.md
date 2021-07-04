@@ -16,11 +16,8 @@
 
 <!-- <hr/> -->
 
-Plot : https://github.com/users/KabueMurage/projects/7
 
-<hr/>
-
-### Setting up
+## Setting up
 1. Assuming the udf is present in the working directory,  include it in your script with the directive : 
 ```Autoit
 #include "_OCRSpace.au3"
@@ -85,7 +82,7 @@ ConsoleWrite( _
 
 <hr/>
 
-### Request for a searchable PDF
+## Request for a searchable PDF
 
 A searchable PDF can be requested and its URI retrieved by:
 1. Set the last option of the `_OCRSpace_SetUpOCR` to `True` :
@@ -118,7 +115,6 @@ ConsoleWrite( _
 
 > Example with a URL reference : [lorem_ipsum.png](https://i.imgur.com/eCuYtDe.png)
 
-
 > [lorem_ipsum.png](https://i.imgur.com/eCuYtDe.png) <br>
 ![lorem_ipsum.png](https://github.com/KabueMurage/AutoIT-OCRSpace-UDF/blob/main/Assets/lorem_ipsum.png?raw=true)
 
@@ -148,12 +144,16 @@ _ArrayDisplay($aText_Detected)
 
 
 <hr/>
+
 ## Other Stuff
 
  - Check the API performance and uptime at the API status page [here](https://status.ocr.space/)
  - Register here for your free OCR API key [here](http://eepurl.com/bOLOcf)
  - Subscribe to a PRO plan [here](https://ocr.space/OCRAPI#pro)
  - If you want to try all the available features of the OCR API, check out their full documentation [here](https://ocr.space/OCRAPI)!
+
+
+  Plot : https://github.com/users/KabueMurage/projects/7
 
 <hr/>
 

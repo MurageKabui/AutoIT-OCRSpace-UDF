@@ -36,10 +36,9 @@ $a_ocr = _OCRSpace_SetUpOCR("0123456789abcdefABCDEF", 1, false, true, "eng")
 $sText_Detected = _OCRSpace_ImageGetText($a_ocr, "receipt.jpg", 0)
 ```
 
-
 <hr/>
 
-### Usage
+## Basic Usage
 
 ```autoit
 ; get your free key at http://eepurl.com/bOLOcf
@@ -55,10 +54,10 @@ $s_textdetected = _OCRSpace_ImageGetText($a_ocr , "https://i.imgur.com/KrS6rRT.j
 ConsoleWrite( _
 	" Detected text   : " & $s_textdetected & @CRLF & _
 	" Error Returned  : " & @error & @CRLF)
-
 ```
 
-<details>
+<!-- <details>
+
 
 <summary>  🔰 [Click to expand the full script] </summary>
 
@@ -81,9 +80,7 @@ ConsoleWrite( _
 			
 ```
 	
-</details>
-
-<br>
+</details> -->
 
 
 <hr/>
@@ -95,13 +92,13 @@ A searchable PDF can be requested and its URI retrieved by:
 ```Autoit
 $a_ocr = _OCRSpace_SetUpOCR($api_key, 1, false, true, "eng", true, Default, Default, True)
 ```
-2. Set the string you want the uri assigned to, in this case `MyPDF_URL_`
+2. Set the string you want the url assigned to, in this case `MyPDF_URL_`
 
 ```Autoit
 ; scan a receipt (using a image uri reference). The url to a searchable pdf requested will be assigned to 'MyPDF_URL_'
 $s_textdetected = _OCRSpace_ImageGetText($a_ocr , "https://i.imgur.com/KrS6rRT.jpeg", 0, "MyPDF_URL_")
 ```
-3. Display the results , evaluate the string pointing to a searchable PDF URI .
+3. Display the results , evaluate the string pointing to a searchable PDF URL .
 ```Autoit
 ConsoleWrite( _
 	" Detected text        : " & $s_textdetected & @CRLF & _
@@ -111,6 +108,47 @@ ConsoleWrite( _
 ```
 <hr/>
 
+## Advanced Usage
+
+- By **Default**, the detected text is returned as a *plain string* **i.e.** when ``$iReturnType`` at  <br> function``_OCRSpace_ImageGetText``   is set to **0** .
+
+- Setting ``$iReturnType`` to **1**   returns a 2D **array** containing  the coordinates of the bounding <br>
+  boxes for each word detected, in the format : ``#WordDetected`` , ``#Left`` , ``#Top`` , ``#Height``,  ``#Width``
+
+
+> Example with a URL reference : [lorem_ipsum.png](https://i.imgur.com/eCuYtDe.png)
+
+
+> [lorem_ipsum.png](https://i.imgur.com/eCuYtDe.png) <br>
+![lorem_ipsum.png](https://github.com/KabueMurage/AutoIT-OCRSpace-UDF/blob/main/Assets/lorem_ipsum.png?raw=true)
+
+
+<details>
+
+<summary>   [Click to Expand the script] </summary>
+
+```Autoit
+; Set your key here.
+$v_OCRSpaceAPIKey = "0123456789abcdefABCDEF"
+
+; SetUp some options.
+$OCROptions = _OCRSpace_SetUpOCR($v_OCRSpaceAPIKey, 1, False, True, "eng", True, Default, Default, False)
+
+; iReturnType : set to 1 to return an array
+$aText_Detected = _OCRSpace_ImageGetText($OCROptions, "https://i.imgur.com/eCuYtDe.png", 1)
+
+; Display the array
+_ArrayDisplay($aText_Detected)
+```
+</details>
+
+
+> Result with ArrayDisplay() <br>
+![lorem_ipsum.png](https://github.com/KabueMurage/AutoIT-OCRSpace-UDF/blob/main/Assets/Results.jpg?raw=true)
+
+
+<hr/>
+## Other Stuff
 
  - Check the API performance and uptime at the API status page [here](https://status.ocr.space/)
  - Register here for your free OCR API key [here](http://eepurl.com/bOLOcf)

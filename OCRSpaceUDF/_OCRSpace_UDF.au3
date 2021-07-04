@@ -201,7 +201,7 @@ Func _OCRSpace_ImageGetText($aOCR_OptionsHandle, $sImage_UrlOrFQPN, $iReturnType
 		$s_lEncb64Dat__ = __URLEncode_($s_lb64Dat__)
 
 		$h_lRequestObj__ = __POSTObjCreate()
-		If $h_lRequestObj__ = "-1" Then Return SetError(6, 0, "")
+		If $h_lRequestObj__ = -1 Then Return SetError(6, 0, "")
 
 		$h_lRequestObj__.Open("POST", "https://api.ocr.space/parse/image", False)
 		$s_lParams__ = "base64Image=data:image/" & $s_lExt & ";base64," & $s_lEncb64Dat__ & "&"
@@ -215,7 +215,7 @@ Func _OCRSpace_ImageGetText($aOCR_OptionsHandle, $sImage_UrlOrFQPN, $iReturnType
 		$h_lRequestObj__.SetRequestHeader("Content-Type", "application/x-www-form-urlencoded")
 		$h_lRequestObj__.Send($s_lParams__)
 
-	ElseIf _PathIsURLA($sImage_UrlOrFQPN) Then
+	ElseIf _PathIsURLA__($sImage_UrlOrFQPN) Then
 		; The important limitation of the GET api endpoint is it only allows image and
 		; PDF submissions via the URL method as only HTTP POST requests can supply additional
 		; data to the server in the message body.
@@ -252,6 +252,7 @@ Func _OCRSpace_ImageGetText($aOCR_OptionsHandle, $sImage_UrlOrFQPN, $iReturnType
 	$s_lAPIResponseText__ = $h_lRequestObj__.ResponseText
 	$i_lAPIRespStatusCode__ = $h_lRequestObj__.Status
 
+	ConsoleWrite($s_lAPIResponseText__ & @CRLF)
 	; Release the object.
 	$h_lRequestObj__ = Null
 
@@ -261,7 +262,7 @@ Func _OCRSpace_ImageGetText($aOCR_OptionsHandle, $sImage_UrlOrFQPN, $iReturnType
 	Switch Int($i_lAPIRespStatusCode__)
 		Case 200
 			If ($aOCR_OptionsHandle[3][1]) And ($iReturnType = 1) Then
-				ConsoleWrite("Overlay info requested as an array :)" & @CRLF )
+				ConsoleWrite("Overlay info requested as an array :)" & @CRLF)
 			EndIf
 			Local $o_lJson__ = _JSON_Parse($s_lAPIResponseText__)
 			If Not @error Then
@@ -291,31 +292,33 @@ Func _OCRSpace_ImageGetText($aOCR_OptionsHandle, $sImage_UrlOrFQPN, $iReturnType
 						Return SetError($__ErrorCode_, $s_lProcessingTimeInMs, $s_lDetectedTxt__)
 					Case 1
 						Local $a_lOverlayArray__[0][5]
-						Local $i_lEnumAllJSONObj__ = 0
-						Local $i_lEnumLinesJSONObj__ = 0
-						Local $i_lEnum_row__ = 0
+						Local $i_lEnumAllJSONObj__ = 0, $i_lEnumLinesJSONObj__ = 0, $i_lEnum_row__ = 0
+						Local $s_lWordText__, $i_lWordPosLeft__, $i_lWordPosTop__, $i_lWordHeight__, $i_lWordWidth__
 
 						While True
-							$sWordText = _JSON_Get($o_lJson__, "ParsedResults[0].TextOverlay.Lines[" & $i_lEnumLinesJSONObj__ & "].Words[" & $i_lEnumAllJSONObj__ & "].WordText")
-							If (@error = 5) Then
+							$s_lWordText__ = _JSON_Get($o_lJson__, "ParsedResults[0].TextOverlay.Lines[" & $i_lEnumLinesJSONObj__ & "].Words[" & $i_lEnumAllJSONObj__ & "].WordText")
+							; Use wordtext to determine if the index I query is out of array range
+							If ($s_lWordText__ = "") Then
 								$i_lEnumLinesJSONObj__ = $i_lEnumLinesJSONObj__ + 1
 								$i_lEnumAllJSONObj__ = 0
+								$s_lWordText__ = _JSON_Get($o_JsonObject, "ParsedResults[0].TextOverlay.Lines[" & $LinesObj & "].Words[" & $iStart & "].WordText")
 							EndIf
 							
-							$iWordPosLeft = _JSON_Get($o_lJson__, "ParsedResults[0].TextOverlay.Lines[" & $i_lEnumLinesJSONObj__ & "].Words[" & $i_lEnumAllJSONObj__ & "].Left")
-							; If $iWordPosLeft = "" Then ExitLoop
-							$iWordPosTop = _JSON_Get($o_lJson__, "ParsedResults[0].TextOverlay.Lines[" & $i_lEnumLinesJSONObj__ & "].Words[" & $i_lEnumAllJSONObj__ & "].Top")
-							$iWordHeight = _JSON_Get($o_lJson__, "ParsedResults[0].TextOverlay.Lines[" & $i_lEnumLinesJSONObj__ & "].Words[" & $i_lEnumAllJSONObj__ & "].Height")
-							$iWordWidth = _JSON_Get($o_lJson__, "ParsedResults[0].TextOverlay.Lines[" & $i_lEnumLinesJSONObj__ & "].Words[" & $i_lEnumAllJSONObj__ & "].Width")
+							$i_lWordPosLeft__ = _JSON_Get($o_lJson__, "ParsedResults[0].TextOverlay.Lines[" & $i_lEnumLinesJSONObj__ & "].Words[" & $i_lEnumAllJSONObj__ & "].Left")
+							; If reached at EOO ..
 							If @error Then ExitLoop 1
-
+							$i_lWordPosTop__ = _JSON_Get($o_lJson__, "ParsedResults[0].TextOverlay.Lines[" & $i_lEnumLinesJSONObj__ & "].Words[" & $i_lEnumAllJSONObj__ & "].Top")
+							$i_lWordHeight__ = _JSON_Get($o_lJson__, "ParsedResults[0].TextOverlay.Lines[" & $i_lEnumLinesJSONObj__ & "].Words[" & $i_lEnumAllJSONObj__ & "].Height")
+							$i_lWordWidth__ = _JSON_Get($o_lJson__, "ParsedResults[0].TextOverlay.Lines[" & $i_lEnumLinesJSONObj__ & "].Words[" & $i_lEnumAllJSONObj__ & "].Width")
+							
+							; expand it for new info..
 							ReDim $a_lOverlayArray__[UBound($a_lOverlayArray__, $UBOUND_ROWS) + 1][UBound($a_lOverlayArray__, $UBOUND_COLUMNS)]
 
-							$a_lOverlayArray__[$i_lEnum_row__][0] = $sWordText
-							$a_lOverlayArray__[$i_lEnum_row__][1] = $iWordPosLeft
-							$a_lOverlayArray__[$i_lEnum_row__][2] = $iWordPosTop
-							$a_lOverlayArray__[$i_lEnum_row__][3] = $iWordHeight
-							$a_lOverlayArray__[$i_lEnum_row__][4] = $iWordWidth
+							$a_lOverlayArray__[$i_lEnum_row__][0] = $s_lWordText__
+							$a_lOverlayArray__[$i_lEnum_row__][1] = $i_lWordPosLeft__
+							$a_lOverlayArray__[$i_lEnum_row__][2] = $i_lWordPosTop__
+							$a_lOverlayArray__[$i_lEnum_row__][3] = $i_lWordHeight__
+							$a_lOverlayArray__[$i_lEnum_row__][4] = $i_lWordWidth__
 
 							$i_lEnumAllJSONObj__ += 1
 							$i_lEnum_row__ += 1
@@ -337,13 +340,13 @@ EndFunc   ;==>_OCRSpace_ImageGetText
 ; EndFunc   ;==>__IsURL_
 
 
-Func _PathIsURLA($_sPath)
-    Local $_aCall = DllCall("shlwapi.dll", "BOOL", "PathIsURLA", "STR", $_sPath)
-    If @error=0 And IsArray($_aCall) Then
-        Return $_aCall[0]=1
-    EndIf
-    Return False
-EndFunc
+Func _PathIsURLA__($_sPath)
+	Local $_aCall = DllCall("shlwapi.dll", "BOOL", "PathIsURLA", "STR", $_sPath)
+	If @error = 0 And IsArray($_aCall) Then
+		Return $_aCall[0] = 1
+	EndIf
+	Return False
+EndFunc   ;==>_PathIsURLA__
 
 Func __URLEncode_($urlText)
 	$url = ""

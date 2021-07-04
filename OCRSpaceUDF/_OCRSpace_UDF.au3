@@ -297,21 +297,21 @@ Func _OCRSpace_ImageGetText($aOCR_OptionsHandle, $sImage_UrlOrFQPN, $iReturnType
 
 						While True
 							$s_lWordText__ = _JSON_Get($o_lJson__, "ParsedResults[0].TextOverlay.Lines[" & $i_lEnumLinesJSONObj__ & "].Words[" & $i_lEnumAllJSONObj__ & "].WordText")
-							; Use wordtext to determine if the index I query is out of array range
+							; Use wordtext to determine if the index I query is out of array range, if it is, increment to next obj, and requery the wordtext. 
 							If ($s_lWordText__ = "") Then
 								$i_lEnumLinesJSONObj__ = $i_lEnumLinesJSONObj__ + 1
 								$i_lEnumAllJSONObj__ = 0
-								$s_lWordText__ = _JSON_Get($o_JsonObject, "ParsedResults[0].TextOverlay.Lines[" & $LinesObj & "].Words[" & $iStart & "].WordText")
+								$s_lWordText__ = _JSON_Get($o_lJson__, "ParsedResults[0].TextOverlay.Lines[" & $i_lEnumLinesJSONObj__ & "].Words[" & $i_lEnumAllJSONObj__ & "].WordText")
 							EndIf
 							
 							$i_lWordPosLeft__ = _JSON_Get($o_lJson__, "ParsedResults[0].TextOverlay.Lines[" & $i_lEnumLinesJSONObj__ & "].Words[" & $i_lEnumAllJSONObj__ & "].Left")
-							; If reached at EOO ..
+							; If reached at EOO, then exitloop without wasting time..
 							If @error Then ExitLoop 1
 							$i_lWordPosTop__ = _JSON_Get($o_lJson__, "ParsedResults[0].TextOverlay.Lines[" & $i_lEnumLinesJSONObj__ & "].Words[" & $i_lEnumAllJSONObj__ & "].Top")
 							$i_lWordHeight__ = _JSON_Get($o_lJson__, "ParsedResults[0].TextOverlay.Lines[" & $i_lEnumLinesJSONObj__ & "].Words[" & $i_lEnumAllJSONObj__ & "].Height")
 							$i_lWordWidth__ = _JSON_Get($o_lJson__, "ParsedResults[0].TextOverlay.Lines[" & $i_lEnumLinesJSONObj__ & "].Words[" & $i_lEnumAllJSONObj__ & "].Width")
-							
-							; expand it for new info..
+
+							; if still ok, make new row for the new info..
 							ReDim $a_lOverlayArray__[UBound($a_lOverlayArray__, $UBOUND_ROWS) + 1][UBound($a_lOverlayArray__, $UBOUND_COLUMNS)]
 
 							$a_lOverlayArray__[$i_lEnum_row__][0] = $s_lWordText__

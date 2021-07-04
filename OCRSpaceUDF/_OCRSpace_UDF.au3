@@ -252,7 +252,7 @@ Func _OCRSpace_ImageGetText($aOCR_OptionsHandle, $sImage_UrlOrFQPN, $iReturnType
 	$s_lAPIResponseText__ = $h_lRequestObj__.ResponseText
 	$i_lAPIRespStatusCode__ = $h_lRequestObj__.Status
 
-	ConsoleWrite($s_lAPIResponseText__ & @CRLF)
+	; ConsoleWrite($s_lAPIResponseText__ & @CRLF)
 	; Release the object.
 	$h_lRequestObj__ = Null
 

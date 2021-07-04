@@ -116,8 +116,9 @@ ConsoleWrite( _
 > Example with a URL reference : [lorem_ipsum.png](https://i.imgur.com/eCuYtDe.png)
 
 > [lorem_ipsum.png](https://i.imgur.com/eCuYtDe.png) <br>
-![lorem_ipsum.png](https://github.com/KabueMurage/AutoIT-OCRSpace-UDF/blob/main/Assets/lorem_ipsum.png?raw=true)
-
+<p align="center">
+  <img src="https://github.com/KabueMurage/AutoIT-OCRSpace-UDF/blob/main/Assets/lorem_ipsum.png?raw=true"><br>
+</p>
 
 <details>
 
@@ -140,7 +141,9 @@ _ArrayDisplay($aText_Detected)
 
 
 > Result with ArrayDisplay() <br>
-![lorem_ipsum.png](https://github.com/KabueMurage/AutoIT-OCRSpace-UDF/blob/main/Assets/Results.jpg?raw=true)
+<p align="center">
+  <img src="https://github.com/KabueMurage/AutoIT-OCRSpace-UDF/blob/main/Assets/array.gif?raw=true"><br>
+</p>
 
 
 <hr/>

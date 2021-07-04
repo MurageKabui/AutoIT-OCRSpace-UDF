@@ -150,9 +150,9 @@ _ArrayDisplay($aText_Detected)
 	
 ```Autoit
   ; Parsing the array ..
-  For $i = 0 To UBound($array, 1) - 1
+  For $i = 0 To UBound($aText_Detected, 1) - 1
     ConsoleWrite( _
-      "Word (" & $array[$i][0] & ")  Left (" & $array[$i][1] & ")" & " Top (" & $array[$i][2] & ") Height (" & $array[$i][3] & ") Width (" & $array[$i][4] & ")" & @CRLF)
+      "Word (" & $aText_Detected[$i][0] & ")  Left (" & $aText_Detected[$i][1] & ")" & " Top (" & $aText_Detected[$i][2] & ") Height (" & $aText_Detected[$i][3] & ") Width (" & $aText_Detected[$i][4] & ")" & @CRLF)
   Next
 
 ```

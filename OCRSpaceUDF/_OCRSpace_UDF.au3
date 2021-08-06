@@ -219,15 +219,17 @@ Func _OCRSpace_ImageGetText($aOCR_OptionsHandle, $sImage_UrlOrFQPN, $iReturnType
 		; The important limitation of the GET api endpoint is it only allows image and
 		; PDF submissions via the URL method as only HTTP POST requests can supply additional
 		; data to the server in the message body.
-		$s_lExt = (StringTrimLeft($sImage_UrlOrFQPN, StringInStr($sImage_UrlOrFQPN, ".", 0, -1)))
-		Switch $s_lExt
-			Case "PDF", "GIF", "PNG", "JPG", "BMP", "PDF", "JPEG"
-				; Supported image file formats are png, jpg (jpeg), gif, tif (tiff) and bmp.
-				; For document ocr, the api supports the Adobe PDF format. Multi-page TIFF files are supported.
-			Case Else
-				Return SetError(5, 0, "")
-		EndSwitch
 
+		; ! REMOVED !! ===
+		; $s_lExt = (StringTrimLeft($sImage_UrlOrFQPN, StringInStr($sImage_UrlOrFQPN, ".", 0, -1)))
+		; Switch $s_lExt
+		; 	Case "PDF", "GIF", "PNG", "JPG", "BMP", "PDF", "JPEG"
+		; 		; Supported image file formats are png, jpg (jpeg), gif, tif (tiff) and bmp.
+		; 		; For document ocr, the api supports the Adobe PDF format. Multi-page TIFF files are supported.
+		; 	Case Else
+		; 		Return SetError(5, 0, "")
+		; EndSwitch
+		; ! =====
 		$h_lRequestObj__ = _GETObjCreate()
 		If $h_lRequestObj__ = "-1" Then Return SetError(6, 0, "")
 
@@ -262,7 +264,7 @@ Func _OCRSpace_ImageGetText($aOCR_OptionsHandle, $sImage_UrlOrFQPN, $iReturnType
 	Switch Int($i_lAPIRespStatusCode__)
 		Case 200
 			If ($aOCR_OptionsHandle[3][1]) And ($iReturnType = 1) Then
-				; ConsoleWrite("Overlay info requested as an array :)" & @CRLF)
+				ConsoleWrite("Overlay info requested as an array :)" & @CRLF)
 			EndIf
 			Local $o_lJson__ = _JSON_Parse($s_lAPIResponseText__)
 			If Not @error Then

@@ -184,9 +184,9 @@ Func _OCRSpace_ImageGetText($aOCR_OptionsHandle, $sImage_UrlOrFQPN, $iReturnType
 	$h_lRequestObj__ = Null
 
 	If (FileExists($sImage_UrlOrFQPN) And StringInStr(FileGetAttrib($sImage_UrlOrFQPN), "D") = 0) Then
-		$s_lExt = (StringTrimLeft($sImage_UrlOrFQPN, StringInStr($sImage_UrlOrFQPN, ".", 0, -1)))
+		$s_lExt = StringLower(StringTrimLeft($sImage_UrlOrFQPN, StringInStr($sImage_UrlOrFQPN, ".", 0, -1)))
 		Switch $s_lExt
-			Case "PDF", "GIF", "PNG", "JPG", "TIF", "BMP", "PDF", "JPEG"
+			Case "pdf", "gif", "png", "jpg", "tif", "bmp", "pdf", "jpeg"
 				; Supported image file formats are png, jpg (jpeg), gif, tif (tiff) and bmp.
 				; For document ocr, the api supports the Adobe PDF format. Multi-page TIFF files are supported.
 			Case Else
@@ -204,7 +204,7 @@ Func _OCRSpace_ImageGetText($aOCR_OptionsHandle, $sImage_UrlOrFQPN, $iReturnType
 		If $h_lRequestObj__ = -1 Then Return SetError(6, 0, "")
 
 		$h_lRequestObj__.Open("POST", "https://api.ocr.space/parse/image", False)
-		$s_lParams__ = "base64Image=data:image/" & $s_lExt & ";base64," & $s_lEncb64Dat__ & "&"
+		$s_lParams__ = "base64Image=data:" & ($s_lExt = "pdf" ? "application/" & $s_lExt : "image/" & $s_lExt) & ";base64," & $s_lEncb64Dat__ & "&"
 		; Append all Prameters..
 		For $i = 1 To UBound($aOCR_OptionsHandle) - 1
 			$s_lParams__ &= $aOCR_OptionsHandle[$i][0] & "=" & StringLower($aOCR_OptionsHandle[$i][1]) & "&"
@@ -262,7 +262,7 @@ Func _OCRSpace_ImageGetText($aOCR_OptionsHandle, $sImage_UrlOrFQPN, $iReturnType
 	Switch Int($i_lAPIRespStatusCode__)
 		Case 200
 			If ($aOCR_OptionsHandle[3][1]) And ($iReturnType = 1) Then
-				ConsoleWrite("Overlay info requested as an array :)" & @CRLF)
+				; ConsoleWrite("Overlay info requested as an array :)" & @CRLF)
 			EndIf
 			Local $o_lJson__ = _JSON_Parse($s_lAPIResponseText__)
 			If Not @error Then

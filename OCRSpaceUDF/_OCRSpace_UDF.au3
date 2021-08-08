@@ -9,7 +9,7 @@
 ; Title ...............: _OCRSpace_UDF.au3
 ; Author ..............: Kabue Murage
 ; AutoIt Version ......: 3.3.14.5
-; UDF Version .........: v1.0
+; UDF Version .........: v1.3
 ; OCRSpace API Version : V3.50
 ; Language ............: English
 ; Description .........: Convert image to text using the OCRSpace API version 3.50
@@ -426,7 +426,6 @@ Func _OCRSpace_ImageGetText($aOCR_OptionsHandle, $sImage_UrlOrFQPN, $iReturnType
 
 	; extended utf-8 charset incase the json contains accents i.e characters like àèéìòù
 	$s_lAPIResponseText__ = _WinAPI_WideCharToMultiByte($s_lAPIResponseText__, 65001)
-
 	Switch Int($i_lAPIRespStatusCode__)
 		Case 200
 			; If ($aOCR_OptionsHandle[3][1]) And ($iReturnType = 1) Then
@@ -455,15 +454,15 @@ Func _OCRSpace_ImageGetText($aOCR_OptionsHandle, $sImage_UrlOrFQPN, $iReturnType
 					Case 0, Default, -1
 						Return SetError($__ErrorCode_, $s_lProcessingTimeInMs, $s_lDetectedTxt__)
 					Case 1
-						; If Not ($aOCR_OptionsHandle[3][1]) Then
-							; ConsoleWrite("Overlay info was NOT requested at _OCRSpace_SetUpOCR()" & @CRLF)
-						; 	; return a stractured array nevertheless
-						; 	Local $aRet[1][2]
+						If Not ($aOCR_OptionsHandle[3][1]) Then
+							ConsoleWrite("Overlay info was NOT requested at _OCRSpace_SetUpOCR()" & @CRLF)
+							; return a stractured array nevertheless
+							Local $aRet[1][2]
 
-						; 	$aRet[0][0] = Stringlen($aRet) 
-						; 	$aRet[0][1] = $s_lDetectedTxt__
-						; 	Return SetError(($__ErrorCode_ = 111 ? 0 : $__ErrorCode_), $s_lProcessingTimeInMs, $aRet)
-						; EndIf
+							$aRet[0][0] = Stringlen($aRet) 
+							$aRet[0][1] = $s_lDetectedTxt__
+							Return SetError(($__ErrorCode_ = 111 ? 0 : $__ErrorCode_), $s_lProcessingTimeInMs, $aRet)
+						EndIf
 
 						Local $a_lOverlayArray__[0][5]
 						Local $i_lEnumAllJSONObj__ = 0, $i_lEnumLinesJSONObj__ = 0, $i_lEnum_row__ = 0

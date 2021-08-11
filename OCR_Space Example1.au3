@@ -15,11 +15,6 @@ Exit
 
 
 ; =========================================================
-; Example 1 : Gets text from a receipt file.
-;           : Searchable PDF is requested and will be assigned to SEARCHABLE_URL
-;           : Process it using a table logic.
-;
-; Defaults  :
 ; _OCRSpace_SetUpOCR( $s_APIKey, _
 ;                     $i_OCREngineID = 1, _
 ;                     $b_IsTable = False, _
@@ -31,59 +26,60 @@ Exit
 ;                     $b_IsCreateSearchablePdf = False)
 ; =========================================================
 Func Example1()
-
-	; Getting text through a local file ref.
-
-	; Create a Searchable PDF ? If true, you'll need to evaluate it.
-	$b_Create_Searchable_PDF = True
+	
+	; THE ONLY MANDATORY PARAMETER!
+	$s_OCR_APIKEY = ""
+	
+	$i_OCR_Engine = Default         ; Default is Engine 1
 
 	; Use a table logic for receipt OCR ?
-	$b_Table = True
+	$b_Table_Logic = False          ; Default is False
 
-	; Set your key here.
-	$v_OCRSpaceAPIKey = "1cd71a8e7688957"
+	$b_Detect_Orientation = False   ; Default is False
 
-	$OCROptions = _OCRSpace_SetUpOCR($v_OCRSpaceAPIKey, 1, $b_Table, True, "eng", True, Default, Default, $b_Create_Searchable_PDF)
+	; Create a Searchable PDF ? If true, you'll need to evaluate it.
+	; You can set a custom evaluation text at the last parameter of _OCRSpace_ImageGetText() [$sURLVar]
+	; The default evaluation text/string is "__OCRSPACE_SEARCHABLE_PDFLINK"
+	$b_Create_Searchable_PDF = False
 
-	$sText_Detected = _OCRSpace_ImageGetText($OCROptions, "receipt.jpg", 0, "SEARCHABLE_URL")
+	; Should be a valid ISO 639-2 Code, 3 characters. See supported languages @ _OCRSpace_SetUpOCR() function header.
+	$s_Language = "eng"
 
-	ConsoleWrite( _
-			" Detected text   : " & $sText_Detected & @CRLF & _
-			" Error Returned  : " & @error & @CRLF & _
-			" PDF URL         : " & Eval("SEARCHABLE_URL") & @CRLF)
+	; if true, we can do an _ArrayDisplay() or play with the returned array..
+	$b_Overlay_Info = False
 
-	Return MsgBox(4, "OCRSpaceUDF Output", $sText_Detected)
+	; auto scale the image?
+	$b_ImageAutoScale = False
+
+	; hide the text layer on the searchable PDf? (Default is False).
+	; At this stage this option is irrelevant since we are not requesting a searchable PDF.
+	$b_SearchablePdfHideTextLayer = Default
+
+	$OCROptions = _OCRSpace_SetUpOCR($s_OCR_APIKEY, $i_OCR_Engine, $b_Table_Logic, $b_Detect_Orientation, $s_Language, $b_Overlay_Info, $b_ImageAutoScale, $b_SearchablePdfHideTextLayer, $b_Create_Searchable_PDF)
+
+	; Make the request with return type set to 0 to get a text only.. (1 gets an array instead.)
+	$Text_Detected = _OCRSpace_ImageGetText($OCROptions, "https://i.imgur.com/eCuYtDe.png", 0, "MyPDFURL")
+
+	; Display the result.. Possible data types are a String and 2D array. All depends on integer set at _OCRSpace_ImageGetText() [$iReturnType]
+	Switch VarGetType($Text_Detected)
+		
+		Case "array" ; i.e $iReturnType at _OCRSpace_ImageGetText() is set to 1
+
+			; Setting $iReturnType to 1 AND $b_Overlay_Info to True returns a 2D array containing the coordinates
+			; of the bounding boxes for each word detected, in the format : #WordDetected , #Left , #Top , #Height, #Width
+			_ArrayDisplay($Text_Detected, "@Error : " & @error)
+
+		Case Else    ; i.e $iReturnType at _OCRSpace_ImageGetText() is set to 0 [DEFAULT]
+
+			; For this request, a searchable PDF was not requested in _OCRSpace_SetUpOCR() [$b_Create_Searchable_PDF = false]
+			; so when evaluating the default evaluation string, the message will be "Searchable PDF not generated as it was not requested."
+			ConsoleWrite( _
+					" Detected text       : " & $Text_Detected & @CRLF & _
+					" Error Returned      : " & @error & @CRLF & _
+					" Searchable PDF link : " & Eval((IsDeclared("MyPDFURL") = $DECLARED_GLOBAL) ? "MyPDFURL" : "__OCRSPACE_SEARCHABLE_PDFLINK") & @CRLF)
+	EndSwitch
+
+	Return
 EndFunc   ;==>Example1
 
 
-; =========================================================
-; Example 2 : Gets text from a image by a url reference
-;           : Searchable PDF is not requested.
-;           : Processes it using a basic logic by default.
-; 
-; Defaults :
-; _OCRSpace_SetUpOCR( $s_APIKey, _
-;                     $i_OCREngineID = 1, _
-;                     $b_IsTable = False, _
-;                     $b_DetectOrientation = True, _
-;                     $s_LanguageISO = "eng", _
-;                     $b_IsOverlayRequired = False, _
-;                     $b_AutoScaleImage = False, _
-;                     $b_IsSearchablePdfHideTextLayer = False, _
-;                     $b_IsCreateSearchablePdf = False)
-; =========================================================
-Func Example2()
-
-	ConsoleWrite("Getting text through a url ref." & @CRLF)
-
-	; Set your key here.
-	$v_OCRSpaceAPIKey = ""
-
-	$OCROptions = _OCRSpace_SetUpOCR($v_OCRSpaceAPIKey, 1, False, True, "eng", True, Default, Default, False)
-	$sText_Detected = _OCRSpace_ImageGetText($OCROptions, "https://i.imgur.com/vbYXwJm.png", 0)
-
-	ConsoleWrite( _
-			" Detected text   : " & $sText_Detected & @CRLF & _
-			" Error Returned  : " & @error & @CRLF)
-	Return
-Endfunc

@@ -43,7 +43,7 @@ $api_key = "0123456789abcdefABCDEF"
 $a_ocr = _OCRSpace_SetUpOCR($api_key, 1, false, true, "eng", true, Default, Default, Default)
 
 ; Scan a receipt (using a local image or remote url reference)
-$sText_Detected = _OCRSpace_ImageGetText($a_ocr , "https://i.imgur.com/KrS6rRT.jpeg", 0)
+$sText_Detected = _OCRSpace_ImageGetText($a_ocr , "https://i.imgur.com/eCuYtDe.png", 0)
 
 ; Display the result.
 ConsoleWrite( _
@@ -66,7 +66,7 @@ $api_key = "0123456789abcdefABCDEF"
 $a_ocr = _OCRSpace_SetUpOCR($api_key, 1, false, true, "eng", true, Default, Default, Default)
 
 ; scan a receipt (using a local image or remote url reference)
-$s_textdetected = _OCRSpace_ImageGetText($a_ocr , "https://i.imgur.com/KrS6rRT.jpeg", 0)
+$s_textdetected = _OCRSpace_ImageGetText($a_ocr , "https://i.imgur.com/eCuYtDe.png", 0)
 
 ; display the result.
 ConsoleWrite( _
@@ -89,7 +89,7 @@ $api_key = "0123456789abcdefABCDEF"
 $a_ocr = _OCRSpace_SetUpOCR($api_key, 1, false, true, "eng", true, Default, Default, Default)
 
 ; scan a receipt (using a image url reference)
-$s_textdetected = _OCRSpace_ImageGetText($a_ocr , "https://i.imgur.com/KrS6rRT.jpeg", 0)
+$s_textdetected = _OCRSpace_ImageGetText($a_ocr , "https://i.imgur.com/eCuYtDe.png", 0)
 
 ; display the result.
 ConsoleWrite( _
@@ -114,7 +114,7 @@ $a_ocr = _OCRSpace_SetUpOCR($api_key, 1, false, true, "eng", true, Default, Defa
 
 ```Autoit
 ; scan a receipt (using a image uri reference). The url to a searchable pdf requested will be assigned to 'MyPDF_URL_'
-$s_textdetected = _OCRSpace_ImageGetText($a_ocr , "https://i.imgur.com/KrS6rRT.jpeg", 0, "MyPDF_URL_")
+$s_textdetected = _OCRSpace_ImageGetText($a_ocr , "https://i.imgur.com/eCuYtDe.png", 0, "MyPDF_URL_")
 ```
 3. Display the results , evaluate the string pointing to a searchable PDF URL .
 ```Autoit
@@ -163,13 +163,6 @@ ConsoleWrite( _
 > Word (sit)  Left (171) Top (15) Height (12) Width (25) <br>
 > Word (amet,)  Left (206) Top (16) Height (12) Width (40) <br>
 > Word (consectetur)  Left (259) Top (15) Height (12) Width (95) <br>
-<!-- > Word (adipisicing)  Left (364) Top (16) Height (12) Width (94) <br>
-> Word (elit,)  Left (469) Top (15) Height (13) Width (40) <br>
-> Word (sed)  Left (521) Top (16) Height (11) Width (25) <br>
-> Word (do)  Left (556) Top (15) Height (12) Width (16) <br>
-> Word (eiusmod)  Left (14) Top (39) Height (12) Width (60) <br>
-> Word (tempor)  Left (84) Top (40) Height (12) Width (51) <br> -->
-
 •••
 
 <hr/>

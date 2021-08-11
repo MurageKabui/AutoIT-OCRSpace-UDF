@@ -3,6 +3,7 @@
 #include <ScreenCapture.au3>
 #include "Json.au3"
 #include <WinAPIConv.au3>
+#include <WinAPIDiag.au3>
 #include <array.au3>
 
 ; =========================================================
@@ -21,8 +22,8 @@
 
 
 ; #CURRENT# =====================================================================================================================
-;_OCRSpace_SetUpOCR
-;_OCRSpace_ImageGetText
+; _OCRSpace_SetUpOCR
+; _OCRSpace_ImageGetText
 ; ===============================================================================================================================
 
 
@@ -93,8 +94,9 @@
 ; Example .......: 0
 ; ============================================================================================================================================
 Func _OCRSpace_SetUpOCR($s_APIKey, $i_OCREngineID = 1, $b_IsTable = False, $b_DetectOrientation = True, $s_LanguageISO = "eng", $b_IsOverlayRequired = False, $b_AutoScaleImage = False, $b_IsSearchablePdfHideTextLayer = False, $b_IsCreateSearchablePdf = False)
-	If ($s_APIKey = "") Then Return SetError(1, 0, "Invalid key")
-	
+
+	If ($s_APIKey = "") Then Return SetError(1, 0, -1)
+
 	Local $a_lSetUp[9][2]
 
 	$a_lSetUp[0][0] = "apikey" ; ! Required!
@@ -106,7 +108,7 @@ Func _OCRSpace_SetUpOCR($s_APIKey, $i_OCREngineID = 1, $b_IsTable = False, $b_De
 	$a_lSetUp[3][0] = "isOverlayRequired"
 	$a_lSetUp[3][1] = (IsBool($b_IsOverlayRequired) ? $b_IsOverlayRequired : False)
 	$a_lSetUp[4][0] = "language" ; ISO (632-B Lang Prefix), length 3 ..
-	$a_lSetUp[4][1] = (((StringIsAlpha($s_LanguageISO) And StringLen($s_LanguageISO) = 3)) ? $s_LanguageISO : "eng")
+	$a_lSetUp[4][1] = (((StringIsAlpha($s_LanguageISO) = 1) And (StringLen($s_LanguageISO) = 3)) ? $s_LanguageISO : "eng")
 	$a_lSetUp[5][0] = "isCreateSearchablePdf"
 	$a_lSetUp[5][1] = (IsBool($b_IsCreateSearchablePdf) ? $b_IsCreateSearchablePdf : False)
 	$a_lSetUp[6][0] = "isSearchablePdfHideTextLayer"
@@ -146,7 +148,7 @@ EndFunc   ;==>_OCRSpace_SetUpOCR
 ; Example .......: No
 ; =============================================================================================================
 Func _OCRSpace_ImageHighlightWord($aOverlayArrayInfo, $sImageFQPN_, $sWord_, $bCaseSense = True)
-	
+
 	; Must be an array with 5 columns as returned by _OCRSpace_ImageGetText() with $iReturnType 1
 	If Not (IsArray($aOverlayArrayInfo) And UBound($aOverlayArrayInfo, $UBOUND_COLUMNS) = 5) Then Return SetError(1, 0, -1)
 	If Not (FileExists($sImageFQPN_) And StringInStr(FileGetAttrib($sImageFQPN_), "D") = 0) Then Return SetError(3, 0, -1)
@@ -154,6 +156,7 @@ Func _OCRSpace_ImageHighlightWord($aOverlayArrayInfo, $sImageFQPN_, $sWord_, $bC
 
 	Local $i_lFound = 0
 
+	; ! Open GDI plus here..
 	For $i = 0 To UBound($aOverlayArrayInfo, $UBOUND_ROWS) - 1 Step +1
 		If (($bCaseSense) ? $aOverlayArrayInfo[$i][0] = $sWord_ : StringInStr($aOverlayArrayInfo[$i][0], $sWord_, $STR_NOCASESENSEBASIC, 1) > 0) Then
 			_OCRSpace_WordDrawRect($sImageFQPN_, $aOverlayArrayInfo[$i][1], $aOverlayArrayInfo[$i][2], $aOverlayArrayInfo[$i][3], $aOverlayArrayInfo[$i][4])
@@ -163,6 +166,7 @@ Func _OCRSpace_ImageHighlightWord($aOverlayArrayInfo, $sImageFQPN_, $sWord_, $bC
 			; Return SetError(($i_lFound = 0) ? 1 : 0, $i_lFound, ($i_lFound = 0) ? False : True)
 		EndIf
 	Next
+	; ! Close and clean GDI+ here..
 	Return SetError(($i_lFound = 0) ? 1 : 0, $i_lFound, ($i_lFound = 0) ? False : True)
 EndFunc   ;==>_OCRSpace_ImageHighlightWord
 
@@ -186,15 +190,17 @@ EndFunc   ;==>_OCRSpace_ImageHighlightWord
 ; Example .......: No
 ; ===============================================================================================================================
 Func _OCRSpace_WordDrawRect($sImageFile, $iLeftPos, $iTopPos, $iHeight, $iWidth, $Pencolor = 0xFF000000, $iScale = 1.0)
-	
+
 	If Not FileExists($sImageFile) Then Return SetError(1, 0, "")
 
 	; Initialize GDI+ library
 	If _GDIPlus_Startup() Then
 
+		Local $s_OutputRet = StringRegExpReplace($sImageFile, "^.*\\", "")
+
 		Local $h_FileImgBitmap, $h_FileImgBitmapEx, $h_Gfx, $hClone, $hBitmap_Scaled
-		Local $i_lXOffset = 20, $i_lYOffset = 8, $i_lWidthOffset = 10, $i_lHeightOffset = 5
-		
+		; Local $i_lXOffset = 20, $i_lYOffset = 8, $i_lWidthOffset = 10, $i_lHeightOffset = 5
+
 		$h_FileImgBitmap = _GDIPlus_BitmapCreateFromFile($sImageFile)
 
 		; Image width
@@ -205,12 +211,11 @@ Func _OCRSpace_WordDrawRect($sImageFile, $iLeftPos, $iTopPos, $iHeight, $iWidth,
 		$hClone = _GDIPlus_BitmapCloneArea($h_FileImgBitmap, 0, 0, $bitmap_w, $bitmap_h, $GDIP_PXF24RGB)
 
 		_GDIPlus_ImageDispose($h_FileImgBitmap)
-
 		_WinAPI_DeleteObject($h_FileImgBitmap)
 
 		; Scales an image by a given factor
 		$hBitmap_Scaled = _GDIPlus_ImageScale($hClone, $iScale, $iScale, $GDIP_INTERPOLATIONMODE_NEARESTNEIGHBOR)
-		
+
 		$h_Gfx = _GDIPlus_ImageGetGraphicsContext($hBitmap_Scaled)
 		; _GDIPlus_GraphicsClear($h_Gfx, 0xFFFFFFFF)
 		; Prepare pen props used to draw a frame around the detected word..
@@ -221,10 +226,10 @@ Func _OCRSpace_WordDrawRect($sImageFile, $iLeftPos, $iTopPos, $iHeight, $iWidth,
 		; $nWidth   The width of the rectangle.
 		; $nHeight  The height of the rectangle.
 
-		_GDIPlus_GraphicsDrawRect($h_Gfx, $iLeftPos - 10, $iTopPos - $i_lYOffset, $iWidth, $iHeight, $hPen)
+		_GDIPlus_GraphicsDrawRect($h_Gfx, $iLeftPos, $iTopPos, $iWidth, $iHeight, $hPen)
 
-    	; Save bitmap to file
-    	_GDIPlus_ImageSaveToFile($hClone, @MyDocumentsDir & "\GDIPlus_Image.bmp")
+		; Save bitmap to file
+		_GDIPlus_ImageSaveToFile($hClone, $sImageFile) ; @MyDocumentsDir & "\GDIPlus_Image.bmp")
 
 		; Save resultant image
 		_GDIPlus_ImageSaveToFile($hBitmap_Scaled, @ScriptDir & "\meme_traced.jpg")
@@ -256,7 +261,7 @@ EndFunc   ;==>_OCRSpace_WordDrawRect
 ; Description ...: Captures a window's text to a text array, given a window title or handle
 ; Syntax.........: _OCRSpace_WinCaptureText($aOCR_OptionsHandle, $hWnd_, $iReturnType = 1)
 ; Return values .: Success :    - The detected text in the format requested via $iReturnType
-;								- @error set to 0 
+;								- @error set to 0
 ;
 ;                  Failure :    - -1 and @error set to :
 ;							  1 - Invalid options : $aOCR_OptionsHandle
@@ -270,24 +275,24 @@ EndFunc   ;==>_OCRSpace_WordDrawRect
 Func _OCRSpace_WinCaptureText($aOCR_OptionsHandle, $hWnd_, $iReturnType = 1)
 	; Ensure the array is as returned by _OCRSpace_SetUpOCR()
 	If Not (IsArray($aOCR_OptionsHandle) And UBound($aOCR_OptionsHandle, $UBOUND_COLUMNS) = 5) Then Return SetError(1, 0, -1)
-	if Not IsHWnd($hWnd_) then return SetError(2, 0, -1)
+	If Not IsHWnd($hWnd_) Then Return SetError(2, 0, -1)
 
 	Local $s_lCaptureFilename = _TempFile(@TempDir, "~", ".bmp")
 	Local $i_lType = $iReturnType
 
-	if Not _ScreenCapture_CaptureWnd($s_lCaptureFilename, $hWnd, 0, 0, -1, -1, False) then Return SetError(3, 0, -1)
+	If Not _ScreenCapture_CaptureWnd($s_lCaptureFilename, $hWnd, 0, 0, -1, -1, False) Then Return SetError(3, 0, -1)
 
 	Switch $i_lType
 		Case 1, 0
 			; okay..
-		Case Else ; default etc
+		Case Else ; default, -1, "",  ..etc
 			$i_lType = 0
 	EndSwitch
 
 	Local $v_lText = _OCRSpace_ImageGetText($aOCR_OptionsHandle, $s_lCaptureFilename, $i_lType)
-	if Not @error then return SetError(0, @extended, $v_lText) 
+	If Not @error Then Return SetError(0, @extended, $v_lText)
 
-	Return  SetError(@error, @extended, $v_lText) 
+	Return SetError(@error, @extended, $v_lText)
 EndFunc   ;==>_OCRSpace_WinCaptureText
 
 
@@ -303,7 +308,7 @@ EndFunc   ;==>_OCRSpace_WinCaptureText
 ;                                              1 return an array
 ; Return values .: Success : Returns the detected text of type specified at $iReturnType
 ;                             -  If a searchable PDF was requested ,its url will be assigned to the string $sURLVar, so to get it evaluate it!
-;                             -  @error flag set to 111 if no error occoured.
+;                             -  @error flag set to 0 if no error occoured.
 ;                             -  @extended is set to the Processing Time In Milliseconds
 ;                  Failure : Returns "" and @error flag set to non-zero ;
 ;                           1 - If UNSET options or error initializing options.
@@ -313,53 +318,61 @@ EndFunc   ;==>_OCRSpace_WinCaptureText
 ;                           5 - An unsupported filetype parsed.
 ;                           6 - Failed to create http request object
 ;                           7 - Failed to parse json returned by OCRSpace
-;                           8 - $sURLVar is not a valid string.
+;                           8 - $sURLVar is not a valid alpha string.
 ; Remarks .......: - Setup your OCR options beforehand using _OCRSpace_SetUpOCR. Also note that the URL method is easy and fast to use, compared to uploading a local file.
 ;                  - StringLeft(@error, 2) shows if used OCR Engine completed successfully, partially or failed with error.
 ;                           1 - Parsed Successfully (Image / All pages parsed successfully)
 ;                           2 - Parsed Partially (Only few pages out of all the pages parsed successfully)
 ;                           3 - Image / All the PDF pages failed parsing (This happens mainly because the OCR engine fails to parse an image)
 ;                           4 - Error occurred when attempting to parse (This happens when a fatal error occurs during parsing )
+;							* =========================================
+;							* 		$__ErrorCode_
+;							* ====================================
+;							? 0  : File not found
+;							? 1  : Success
+;							? 10 : OCR Engine Parse Error
+;							? 20 : Timeout
+;							? 30 : Validation Error
+;							? 99 : Unknown Error
 ;
-;	* =========================================
-;	* 		$__ErrorCode_
-;	* ====================================
-;	? 0  : File not found
-;	? 1  : Success
-;	? 10 : OCR Engine Parse Error
-;	? 20 : Timeout
-;	? 30 : Validation Error
-;	? 99 : Unknown Error 
 ; ===============================================================================================================================
 Func _OCRSpace_ImageGetText($aOCR_OptionsHandle, $sImage_UrlOrFQPN, $iReturnType = 0, $sURLVar = "__OCRSPACE_SEARCHABLE_PDFLINK")
-	
+
 	Local $oError = ObjEvent("AutoIt.Error", "___OCRSpace__COMErrFunc")
 	#forceref $oError
 
 	If Not (IsArray($aOCR_OptionsHandle) And UBound($aOCR_OptionsHandle, $UBOUND_COLUMNS) <> 5) Then Return SetError(1, 0, "")
-	if Not IsString($sURLVar) then Return SetError(8, 0, "")
+	If Not IsString($sURLVar) Then Return SetError(8, 0, "")
+
+	If (IsConnected() = False) Then
+		ConsoleWrite("No Internet Connection!" & @CRLF)
+		Return SetError(800, 0, "")
+	EndIf
 
 	Local $s_lExt, $s_lParams__
 	Local $i_lAPIRespStatusCode__
 	Local $d_ImgBinDat__
-	Local $h_lFileOpen__
+	Local $h_lFileOpen__, $h_lRequestObj__ = Null
+
 
 	; If a ssearchable pdf was requested and the URL string to be set to is undefined.
 	If ($aOCR_OptionsHandle[5][1]) Then
+
+		Local Const $S_LSEARCHABLEPDFLINK = "__OCRSPACE_SEARCHABLE_PDFLINK"
+
 		Switch $sURLVar
 			Case Default, -1, ""
-				$sURLVar = "__OCRSPACE_SEARCHABLE_PDFLINK"
+				$sURLVar = $S_LSEARCHABLEPDFLINK ; "__OCRSPACE_SEARCHABLE_PDFLINK"
 			Case Else
-				$sURLVar = (StringLen($sURLVar) > 1) ? $sURLVar : "__OCRSPACE_SEARCHABLE_PDFLINK"
+				$sURLVar = ((StringLen($sURLVar) > 1) And (StringIsAlpha($sURLVar) = 1)) ? $sURLVar : $S_LSEARCHABLEPDFLINK
 		EndSwitch
+
 	EndIf
-	
-	$h_lRequestObj__ = Null
 
 	If (FileExists($sImage_UrlOrFQPN) And StringInStr(FileGetAttrib($sImage_UrlOrFQPN), "D") = 0) Then
 		$s_lExt = StringLower(StringTrimLeft($sImage_UrlOrFQPN, StringInStr($sImage_UrlOrFQPN, ".", 0, -1)))
 		Switch $s_lExt
-			Case "pdf", "gif", "png", "jpg", "tif", "bmp", "pdf", "jpeg"
+			Case "pdf", "gif", "png", "jpg", "tif", "bmp", "pdf", "jpeg" ; "tiff"
 				; do nothing ..
 				; Supported image file formats are png, jpg (jpeg), gif, tif (tiff) and bmp.
 				; For document ocr, the api supports the Adobe PDF format. Multi-page TIFF files are supported.
@@ -367,7 +380,7 @@ Func _OCRSpace_ImageGetText($aOCR_OptionsHandle, $sImage_UrlOrFQPN, $iReturnType
 				Return SetError(5, 0, "")
 		EndSwitch
 
-		$h_lFileOpen__ = FileOpen($sImage_UrlOrFQPN, 16) ; $FO_BINARY 
+		$h_lFileOpen__ = FileOpen($sImage_UrlOrFQPN, 16) ; $FO_BINARY
 		If $h_lFileOpen__ = -1 Then Return SetError(3, 0, "")
 
 		$d_ImgBinDat__ = FileRead($h_lFileOpen__)
@@ -381,7 +394,7 @@ Func _OCRSpace_ImageGetText($aOCR_OptionsHandle, $sImage_UrlOrFQPN, $iReturnType
 		$h_lRequestObj__.Open("POST", "https://api.ocr.space/parse/image", False) ; Let's Go!
 
 		$s_lParams__ = "base64Image=data:" & ($s_lExt = "pdf" ? "application/" & $s_lExt : "image/" & $s_lExt) & ";base64," & $s_lEncb64Dat__ & "&"
-		
+
 		; Append all Prameters..
 		For $i = 1 To UBound($aOCR_OptionsHandle) - 1
 			$s_lParams__ &= StringLower($aOCR_OptionsHandle[$i][0] & "=" & $aOCR_OptionsHandle[$i][1] & "&")
@@ -393,6 +406,7 @@ Func _OCRSpace_ImageGetText($aOCR_OptionsHandle, $sImage_UrlOrFQPN, $iReturnType
 		$h_lRequestObj__.Send($s_lParams__)
 
 	ElseIf _PathIsURLA__($sImage_UrlOrFQPN) Then
+
 		; The important limitation of the GET api endpoint is it only allows image and
 		; PDF submissions via the URL method as only HTTP POST requests can supply additional
 		; data to the server in the message body...
@@ -405,8 +419,9 @@ Func _OCRSpace_ImageGetText($aOCR_OptionsHandle, $sImage_UrlOrFQPN, $iReturnType
 		; (file parameter) or BASE64 strings (base64image) method..
 
 		$s_lParams__ = "https://api.ocr.space/parse/ImageUrl?" & $aOCR_OptionsHandle[0][0] & "=" & $aOCR_OptionsHandle[0][1] & "&url=" & $sImage_UrlOrFQPN & "&"
+
 		For $i = 1 To UBound($aOCR_OptionsHandle) - 1
-			$s_lParams__ &= StringLower($aOCR_OptionsHandle[$i][0] & "=" & $aOCR_OptionsHandle[$i][1] & "&")
+			$s_lParams__&= $aOCR_OptionsHandle[$i][0] & "=" & $aOCR_OptionsHandle[$i][1] & "&"
 		Next
 		; Trim a trailing ampersand.
 		$s_lParams__ = StringTrimRight($s_lParams__, 1)
@@ -429,11 +444,12 @@ Func _OCRSpace_ImageGetText($aOCR_OptionsHandle, $sImage_UrlOrFQPN, $iReturnType
 	Switch Int($i_lAPIRespStatusCode__)
 		Case 200
 			; If ($aOCR_OptionsHandle[3][1]) And ($iReturnType = 1) Then
-				; ConsoleWrite("Overlay info requested as an array :)" & @CRLF)
+			; ConsoleWrite("Overlay info requested as an array :)" & @CRLF)
 			; EndIf
 			Local $o_lJson__ = _JSON_Parse($s_lAPIResponseText__)
 			If Not @error Then
-				$__ErrorCode_ = Null
+				Local $__ErrorCode_ = Null
+
 				$s_lDetectedTxt__ = _JSON_Get($o_lJson__, "ParsedResults[0].ParsedText")            ; Returned
 				$s_lProcessingTimeInMs = _JSON_Get($o_lJson__, "ProcessingTimeInMilliseconds")      ; Set to @extended.
 				; The exit code shows if OCR completed successfully, partially or failed with error.
@@ -441,25 +457,27 @@ Func _OCRSpace_ImageGetText($aOCR_OptionsHandle, $sImage_UrlOrFQPN, $iReturnType
 				$__ErrorCode_ &= $i_lOCREngineExitCode
 				; The exit code returned by the parsing engine. Set to extended..
 				$i_lFileParseExitCode = _JSON_Get($o_lJson__, "ParsedResults[0].FileParseExitCode")
+
 				$i_lFileParseExitCode = (StringLeft($i_lFileParseExitCode, 1) = "-") ? StringTrimLeft($i_lFileParseExitCode, 1) : $i_lFileParseExitCode
+
 				$__ErrorCode_ &= $i_lFileParseExitCode
 				$s__lSearchablePDFURL_ = _JSON_Get($o_lJson__, "SearchablePDFURL")
 
 				Assign($sURLVar, $s__lSearchablePDFURL_, $ASSIGN_FORCEGLOBAL)
 
-				$i_lErrorOnProcessing = (_JSON_Get($o_lJson__, "IsErroredOnProcessing") ? 0 : 1) ; IsErroredOnProcessing is initially bool.
+				$i_lErrorOnProcessing = (_JSON_Get($o_lJson__, "IsErroredOnProcessing") ? 0 : 1) ; bool -> int
 				$__ErrorCode_ &= $i_lErrorOnProcessing
 
 				Switch $iReturnType
 					Case 0, Default, -1
 						Return SetError($__ErrorCode_, $s_lProcessingTimeInMs, $s_lDetectedTxt__)
-					Case 1
-						If Not ($aOCR_OptionsHandle[3][1]) Then
+					Case 1 ; User wants an array explictly..
+						If Not ($aOCR_OptionsHandle[3][1]) Then ; but the array info wasn't requested .. soo..
 							ConsoleWrite("Overlay info was NOT requested at _OCRSpace_SetUpOCR()" & @CRLF)
 							; return a stractured array nevertheless
 							Local $aRet[1][2]
 
-							$aRet[0][0] = Stringlen($aRet) 
+							$aRet[0][0] = StringLen($aRet)
 							$aRet[0][1] = $s_lDetectedTxt__
 							Return SetError(($__ErrorCode_ = 111 ? 0 : $__ErrorCode_), $s_lProcessingTimeInMs, $aRet)
 						EndIf
@@ -475,14 +493,14 @@ Func _OCRSpace_ImageGetText($aOCR_OptionsHandle, $sImage_UrlOrFQPN, $iReturnType
 								$i_lEnumAllJSONObj__ = 0
 								$s_lWordText__ = _JSON_Get($o_lJson__, "ParsedResults[0].TextOverlay.Lines[" & $i_lEnumLinesJSONObj__ & "].Words[" & $i_lEnumAllJSONObj__ & "].WordText")
 							EndIf
+
 							$i_lWordPosLeft__ = _JSON_Get($o_lJson__, "ParsedResults[0].TextOverlay.Lines[" & $i_lEnumLinesJSONObj__ & "].Words[" & $i_lEnumAllJSONObj__ & "].Left")
-							; If reached at EOO, then exitloop without wasting time..
-							If @error Then ExitLoop 1
+							If @error Then ExitLoop 1 ; If reached at EOO, then exitloop without wasting time..
+
 							$i_lWordPosTop__ = _JSON_Get($o_lJson__, "ParsedResults[0].TextOverlay.Lines[" & $i_lEnumLinesJSONObj__ & "].Words[" & $i_lEnumAllJSONObj__ & "].Top")
 							$i_lWordHeight__ = _JSON_Get($o_lJson__, "ParsedResults[0].TextOverlay.Lines[" & $i_lEnumLinesJSONObj__ & "].Words[" & $i_lEnumAllJSONObj__ & "].Height")
 							$i_lWordWidth__ = _JSON_Get($o_lJson__, "ParsedResults[0].TextOverlay.Lines[" & $i_lEnumLinesJSONObj__ & "].Words[" & $i_lEnumAllJSONObj__ & "].Width")
-							
-							; Redim the rows of our 2D array..
+
 							ReDim $a_lOverlayArray__[UBound($a_lOverlayArray__, $UBOUND_ROWS) + 1][UBound($a_lOverlayArray__, $UBOUND_COLUMNS)]
 							$a_lOverlayArray__[$i_lEnum_row__][0] = $s_lWordText__
 							$a_lOverlayArray__[$i_lEnum_row__][1] = $i_lWordPosLeft__
@@ -493,8 +511,8 @@ Func _OCRSpace_ImageGetText($aOCR_OptionsHandle, $sImage_UrlOrFQPN, $iReturnType
 							$i_lEnumAllJSONObj__ += 1
 							$i_lEnum_row__ += 1
 						WEnd
-						; ? Check all possibible values for the error code.
-						if ($__ErrorCode_ = 111) then $__ErrorCode_ = 0
+
+						If ($__ErrorCode_ = 111) Then $__ErrorCode_ = 0
 
 						Return SetError($__ErrorCode_, $s_lProcessingTimeInMs, $a_lOverlayArray__)
 				EndSwitch
@@ -505,9 +523,10 @@ Func _OCRSpace_ImageGetText($aOCR_OptionsHandle, $sImage_UrlOrFQPN, $iReturnType
 EndFunc   ;==>_OCRSpace_ImageGetText
 
 Func ___OCRSpace__COMErrFunc()
-	If Not _WinAPI_IsInternetConnected() Then
+	If (IsConnected() = False) Then
+		; SetError(800, 0)
 		ConsoleWrite("No Internet Connection!" & @CRLF)
-		; SetError(800, 0, -1)
+		; Exit
 	EndIf
 	; Do nothing special, just check @error after suspect functions.
 EndFunc   ;==>___OCRSpace__COMErrFunc
@@ -515,19 +534,19 @@ EndFunc   ;==>___OCRSpace__COMErrFunc
 
 Func IsConnected()
 
-	Local Const $NETWORK_ALIVE_LAN = 0x1         ; net card connection
-	Local Const $NETWORK_ALIVE_WAN = 0x2         ; RAS (internet) connection
-	Local Const $NETWORK_ALIVE_AOL = 0x4         ; AOL
+	Local Const $NETWORK_ALIVE_LAN = 0x1 ; net card connection
+	Local Const $NETWORK_ALIVE_WAN = 0x2 ; RAS (internet) connection
+	Local Const $NETWORK_ALIVE_AOL = 0x4 ; AOL
 
-	Local $aRet, $iResult = null
+	Local $aRet, $sResult = Null
 
 	$aRet = DllCall("sensapi.dll", "int", "IsNetworkAlive", "int*", 0)
 
-	If BitAND($aRet[1], $NETWORK_ALIVE_LAN) Then $iResult &= "LAN connected" & @LF
-	If BitAND($aRet[1], $NETWORK_ALIVE_WAN) Then $iResult &= "WAN connected" & @LF
-	If BitAND($aRet[1], $NETWORK_ALIVE_AOL) Then $iResult &= "AOL connected" & @LF
+	If BitAND($aRet[1], $NETWORK_ALIVE_LAN) Then $sResult &= "LAN connected" & @LF
+	If BitAND($aRet[1], $NETWORK_ALIVE_WAN) Then $sResult &= "WAN connected" & @LF
+	If BitAND($aRet[1], $NETWORK_ALIVE_AOL) Then $sResult &= "AOL connected" & @LF
 
-	Return $iResult
+	Return (($sResult = Null) ? False : $sResult)
 EndFunc   ;==>IsConnected
 
 

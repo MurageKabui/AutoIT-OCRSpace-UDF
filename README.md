@@ -92,9 +92,7 @@ ConsoleWrite( _
 
 ## Scanning a PDF
 
-<!-- You can use this UDF to extract text from scanned papers (e.g. Invoices, Receipts etc).  -->
-
-1. Scan a PDF file ; [Human_Genome_Project.pdf](https://www.lkouniv.ac.in/site/writereaddata/siteContent/202003271601129023vibha_Human_Genome_Project.pdf)
+Could be to extract text from scanned papers (e.g. Invoices, Receipts etc.). For this example, scan a PDF <br> file ; [Human_Genome_Project.pdf](https://www.lkouniv.ac.in/site/writereaddata/siteContent/202003271601129023vibha_Human_Genome_Project.pdf)
 
 ```Autoit
 #include "OCRSpaceUDF\_OCRSpace.au3"

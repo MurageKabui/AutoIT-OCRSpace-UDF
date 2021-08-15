@@ -3,7 +3,7 @@
   <img src="https://i.imgur.com/fpHBLJw.png"><br>
 </p>
 <p align="center">
-	<b> This UDF provides text capturing support for applications and controls using the OCRSpace API - a powerful Online OCR service that 
+	This UDF provides text capturing support for applications and controls using the OCRSpace API - a powerful Online OCR service that 
 		converts images of text documents into editable files by using Optical Character Recognition (OCR) 
 	<br>
 </p>

@@ -55,23 +55,11 @@ ConsoleWrite( _
 
 <hr/>
 
-
-## Basic Usage
+## Functions & Syntax
 
 ```autoit
-; get your free key at http://eepurl.com/bOLOcf
-$api_key = "0123456789abcdefABCDEF"
-
-; setup some preferences in retrospect.
-$a_ocr = _OCRSpace_SetUpOCR($api_key, 1, false, true, "eng", true, Default, Default, Default)
-
-; scan a receipt (using a local image or remote url reference)
-$s_textdetected = _OCRSpace_ImageGetText($a_ocr , "https://i.imgur.com/eCuYtDe.png", 0)
-
-; display the result.
-ConsoleWrite( _
-	" Detected text   : " & $s_textdetected & @CRLF & _
-	" Error Returned  : " & @error & @CRLF)
+_OCRSpace_SetUpOCR($s_APIKey, $i_OCREngineID = 1, $b_IsTable = False, $b_DetectOrientation = True, $s_LanguageISO = "eng", $b_IsOverlayRequired = False, $b_AutoScaleImage = False, $b_IsSearchablePdfHideTextLayer = False, $b_IsCreateSearchablePdf = False)
+_OCRSpace_ImageGetText($aOCR_OptionsHandle, $sImage_UrlOrFQPN, $iReturnType = 0, $sURLVar = "__OCRSPACE_SEARCHABLE_PDFLINK")
 ```
 
 <!-- <details>
@@ -95,15 +83,77 @@ $s_textdetected = _OCRSpace_ImageGetText($a_ocr , "https://i.imgur.com/eCuYtDe.p
 ConsoleWrite( _
 			" Detected text   : " & $s_textdetected & @CRLF & _
 			" Error Returned  : " & @error & @CRLF)
-			
+
 ```
 	
 </details> -->
 
+<hr/>
+
+## Scanning a PDF
+
+1. Scan a PDF file ; [Human_Genome_Project.pdf](https://www.lkouniv.ac.in/site/writereaddata/siteContent/202003271601129023vibha_Human_Genome_Project.pdf)
+
+```Autoit
+#include "OCRSpaceUDF\_OCRSpace.au3"
+
+; get your free key at http://eepurl.com/bOLOcf
+$api_key = "0123456789abcdefABCDEF"
+
+; setup some preferences in retrospect.
+$a_ocr = _OCRSpace_SetUpOCR($api_key, 1, false, true, "eng", true, Default, Default, Default)
+
+; scan a PDF file (Using a PDF URL reference)
+$s_textdetected = _OCRSpace_ImageGetText($a_ocr , "https://www.lkouniv.ac.in/site/writereaddata/siteContent/202003271601129023vibha_Human_Genome_Project.pdf", 0)
+
+; display the result.
+ConsoleWrite( _
+	" Detected text   : " & $s_textdetected & @CRLF & _
+	" Error Returned  : " & @error & @CRLF)	
+```
+
+<details>
+	
+<summary> Expand Output </summary>
+	
+```
+	 Detected text       : Human Genome Proiect
+Introduction
+The Human Genome Project (HGP) is an internationally collaborative Rnture to identiöy and mark all
+the locations of every- gene of the human species. The HGP in the United States was started in 1990
+and was expected to be a fifteen year effort to map the human genome. There have been a number of
+technological advances since 1990 that have accelerated the progress of the project to a completion
+date sometime during the year 2003. The US. HGP is composed of the Depaftnent of Energy (DOE)
+and the National Institute of Health (NIH) uålich hopes to discoRr 50,000 to 100,000 human genes
+and make them available for biological study There are a number of other countries that are
+involved in the project, including Australia: Brazil, Canada, France, Germany, Japan, and the United
+Kingdom Besides numerous countries involved in the project there is also a number of commercial
+companies that are invoked in sequencing. The collaborative 3 billion dollar price tag will be used to
+sequence the possible 3 billion DNA base pairs of human DNA_
+The possibilities from the information that will be obtained from the project are virtually endless. It
+will most likely change many biological and medical research techniques and many of the practices
+
+used by our medical professionals today. The knowledge that will be obtained will help lead to new
+ways of diagnosing, treating, and possibly preventing diseases. Through the discovery of the human
+genome, the possibilities are endless for agriculture, health semices, and new energy sources also. The
+end result of the HGP will be information about the structure, and organization of DNA_ as
+we know it today.
+Since the beginning of time, people have yearned to explore the un_known, chaff where they har
+been, and contemplate uhat they har found. The maps we make of these treks enable the next
+explorers to push ever farther the boundaries of our knowledge - about the the sea, the sky, and
+indeed, ourselves. On a new quest to chafi the innermost reaches of the human cell, scientists have
+now set out on biology's most important mappmg expedition the Human Genome Project Its mission
+...
+Error Returned      : 0
+Searchable PDF link : https://api.ocr.space/SearchablePDF/a56f1495-6666-4085-8d16-5900a26d2245.pdf
+```
+
+
+</details>
 
 <hr/>
 
-## Request for a searchable PDF
+## Request a searchable PDF
 
 A searchable PDF can be requested and its URL retrieved by:
 1. Set the last option of the `_OCRSpace_SetUpOCR` to `True` :
@@ -157,12 +207,16 @@ ConsoleWrite( _
 
 ```
 ### Output :
-> Word (Lorem)  Left (14) Top (17) Height (10) Width (42) <br>
-> Word (ipsum)  Left (66) Top (16) Height (12) Width (43) <br>
-> Word (dolor)  Left (119) Top (15) Height (12) Width (42) <br>
-> Word (sit)  Left (171) Top (15) Height (12) Width (25) <br>
-> Word (amet,)  Left (206) Top (16) Height (12) Width (40) <br>
-> Word (consectetur)  Left (259) Top (15) Height (12) Width (95) <br>
+
+```
+Word (Lorem)  Left (14) Top (17) Height (10) Width (42)
+Word (ipsum)  Left (66) Top (16) Height (12) Width (43)
+Word (dolor)  Left (119) Top (15) Height (12) Width (42)
+Word (sit)  Left (171) Top (15) Height (12) Width (25)
+Word (amet,)  Left (206) Top (16) Height (12) Width (40)
+Word (consectetur)  Left (259) Top (15) Height (12) Width (95)
+```
+
 •••
 
 <hr/>
@@ -191,7 +245,4 @@ Use this however you want, all at your own risk. This code is in no way affiliat
 and/or AutoIt or any of its affiliates or subsidiaries. This is independent and unofficial.
 
 <hr/>
-<!-- 
-## About
-Hate to ask you to star this cs if you found this creation useful, this will happen naturally, 
-For support, just contact me! Enjoy 🎉 -->
+

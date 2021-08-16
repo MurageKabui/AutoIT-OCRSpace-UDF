@@ -51,7 +51,7 @@
 ;                        - Usually better with rotated text (Forum: Detect image spam)
 ;                        - Image size limit 5000px width and 5000px height
 ;
-; $b_IsTable             - [Optional] True or False (DEFAULT : False)
+; $b_IsTable             - [Optional] True or False (DEFAULT : False.)
 ;                          If set to true, the OCR logic makes sure that the parsed text result is always returned line by line. This switch
 ;                          is recommended for table OCR, receipt OCR, invoice processing and all other type of input documents that have a table
 ;                          like structure.

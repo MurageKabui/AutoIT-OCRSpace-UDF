@@ -198,7 +198,7 @@ ConsoleWrite( _
 
 	
 ```Autoit
-  ; Parsing the array ..
+  ; Iterating the array..
   For $i = 0 To UBound($aText_Detected, 1) - 1
     ConsoleWrite( _
       "Word (" & $aText_Detected[$i][0] & ")  Left (" & $aText_Detected[$i][1] & ")" & " Top (" & $aText_Detected[$i][2] & ") Height (" & $aText_Detected[$i][3] & ") Width (" & $aText_Detected[$i][4] & ")" & @CRLF)
